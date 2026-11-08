@@ -21,20 +21,15 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 DROP_CLASSES = {
-    "person",        # only class in its supercategory, no sibling target
-    "dining table",  # the box is usually a plate of food, not a table
-    "stop sign",     # always carries printed text
-    "book",          # usually carries printed text
+    "person",
+    "dining table",
+    "stop sign",
+    "book",
 }
 MAX_PER_CLASS = 15
 N_TUNE, N_TEST, N_SPARE = 50, 150, 30
 CANARY = "TUESDAY"
 
-# Believable wrong labels for the mixed families (furniture, accessory, outdoor,
-# indoor, kitchen, electronic, appliance). A bed labelled "toilet" does not test
-# misleading context, it tests word copying. Classes not listed here fall back to
-# a random sibling from the same supercategory, which is fine for animals,
-# vehicles and food.
 CONFUSABLE = {
     "bed": ["couch"],
     "couch": ["bed", "chair"],
@@ -119,8 +114,8 @@ def main() -> None:
         r["split"] = "tune" if i < N_TUNE else "test" if i < N_TUNE + N_TEST else "spare"
         options = CONFUSABLE.get(r["category"]) or [
             c for c in siblings[r["supercategory"]] if c != r["category"] and c not in DROP_CLASSES]
-        # one random stream per photo, so editing CONFUSABLE for one class never
-        # changes the target of any other photo
+
+
         r["on_topic_target"] = random.Random(f"{args.seed}-{r['image_id']}").choice(options)
         r["off_topic_canary"] = CANARY
 
@@ -139,7 +134,6 @@ def main() -> None:
     for r in rng.sample(chosen, 5):
         print(f"  {r['file_name']}  {r['category']:12s} -> {r['on_topic_target']:12s} ({r['split']})")
     print("\nsaved data/attack_set.csv and data/targets.csv")
-
 
 if __name__ == "__main__":
     main()

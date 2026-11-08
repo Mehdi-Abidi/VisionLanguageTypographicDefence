@@ -82,6 +82,5 @@ def main() -> None:
     for name, n in sorted(by_super.items(), key=lambda kv: -kv[1]):
         print(f"  {name:12s} {n}")
 
-
 if __name__ == "__main__":
     main()

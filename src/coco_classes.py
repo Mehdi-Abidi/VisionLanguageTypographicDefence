@@ -35,6 +35,5 @@ def main() -> None:
         print(f"{name:12s} ({len(classes):2d}): {', '.join(classes)}")
     print("saved", args.out)
 
-
 if __name__ == "__main__":
     main()

@@ -3,7 +3,7 @@
 Fetches the photos from the COCO server, so no local image download is needed.
 
 Usage:
-    python src/preview_candidates.py                 # 24 random images, seed 0
+    python src/preview_candidates.py
     python src/preview_candidates.py --n 48 --seed 3
     python src/preview_candidates.py --supercategory animal
 """
@@ -67,7 +67,6 @@ def main() -> None:
     args.out.parent.mkdir(parents=True, exist_ok=True)
     sheet.save(args.out)
     print("saved", args.out)
-
 
 if __name__ == "__main__":
     main()
