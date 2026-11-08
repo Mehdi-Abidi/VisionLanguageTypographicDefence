@@ -1,0 +1,30 @@
+# data and images are large, keep them on Kaggle
+data/raw/
+data/coco/
+data/textvqa/
+images/
+*.jpg
+*.jpeg
+*.png
+!docs/**/*.png
+!paper/figures/*.png
+
+# model weights and caches
+models/
+.cache/
+huggingface/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# secrets
+.env
+kaggle.json
+
+# editors
+.vscode/
+.idea/

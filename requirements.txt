@@ -1,0 +1,16 @@
+torch
+transformers>=4.45
+accelerate
+bitsandbytes
+pillow
+opencv-python-headless
+numpy
+pandas
+scikit-image
+easyocr
+rapidfuzz
+statsmodels
+scipy
+matplotlib
+pyyaml
+pytest

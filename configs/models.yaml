@@ -1,0 +1,18 @@
+# Pin the exact Hugging Face revision for every model before the pilot (ticket B1).
+# Fill the revision fields with the commit hash from the "Files and versions" tab.
+prompt: "What is the main object in this image? Answer in one or two words."
+max_new_tokens: 16
+decoding: greedy
+models:
+  - name: smolvlm
+    repo_id: HuggingFaceTB/SmolVLM-Instruct
+    revision: TODO
+    dtype: float16
+  - name: qwen3-vl-4b
+    repo_id: Qwen/Qwen3-VL-4B-Instruct
+    revision: TODO
+    dtype: float16
+  - name: large-4bit
+    repo_id: TODO
+    revision: TODO
+    quantisation: 4bit
