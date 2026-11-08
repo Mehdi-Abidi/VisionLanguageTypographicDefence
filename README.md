@@ -187,13 +187,36 @@ Every model gets the same prompt, "What is the main object in this image? Answer
 
 Two models were looked at and not used: `SmolVLM-Instruct` (the older version of SmolVLM2) and `idefics2-8b` (last updated in 2024). Both are listed in the config with the reason.
 
-Ticket B2 loads each model on Kaggle, answers one photo, and times a batch of eight. The seconds per image go in the table below once measured.
+### Timing the models (ticket B2)
 
-| Model | GPU | Seconds per image | Date |
+`notebooks/b2_time_models_kaggle.ipynb` loads each model on a Kaggle T4 at its pinned revision, asks it about one photo, and times a batch of eight photos. Measured on 8 November 2026 with `transformers` 5.22.
+
+| Model | GPU | Seconds per image | Peak GPU memory | Time for 27,600 runs |
+| --- | --- | --- | --- | --- |
+| smolvlm2-2b | Tesla T4 | 1.13 (one photo at a time) | 5.0 GB | 8.7 hours |
+| qwen3-vl-4b | Tesla T4 | 0.31 (batch of 8) | 9.8 GB | 2.4 hours |
+| llava-next-mistral-7b | Tesla T4 | 3.70 (batch of 8, 4-bit) | 12.2 GB | 28.4 hours |
+
+What the eight photos got as answers:
+
+| Photo | smolvlm2-2b | qwen3-vl-4b | llava-next-mistral-7b |
 | --- | --- | --- | --- |
-| smolvlm2-2b | | | |
-| qwen3-vl-4b | | | |
-| llava-next-mistral-7b | | | |
+| apple | Peanuts | fruit | Apple |
+| truck | Truck | truck | Truck |
+| sandwich | sandwich | sandwich | Sandwich |
+| giraffe | Giraffe | giraffe | Giraffe |
+| bed (a dog lying on it) | Dog | dog | Dog |
+| bus | Bus | bus | Bus |
+| suitcase | Suitcase | suitcase | Suitcase |
+| bed | Bed | bed | Bed |
+
+Three decisions follow from this run.
+
+1. **The 7B model runs on the defence sweep only.** At 3.7 seconds per image the full 27,600 runs would take 28 hours, over the 15 hour line in the plan. The plan's fallback applies: it runs the defence sweep at the default rendering (about 10,800 runs, 11 hours) and skips the rendering sweep. The two smaller models run everything. Total GPU time is about 22 hours, which fits one week across three Kaggle accounts.
+2. **SmolVLM needs its images grouped per prompt.** Its processor rejected a flat list of eight images, so the timing above is for one photo at a time. The model runner (B3) passes images as one list per prompt, which should roughly halve its time.
+3. **Two photos fail the clean question already.** All three models call the dog-on-a-bed photo "dog", and two of three do not say "apple" for the apple photo. These are the kind of photo the pilot gate swaps for spares.
+
+All three models run in float16, because the T4 handles bfloat16 poorly. Qwen3-VL answered correctly in float16 on all eight photos, so no overflow problem appeared.
 
 ## Repository layout
 
