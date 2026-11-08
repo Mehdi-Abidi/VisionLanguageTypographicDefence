@@ -2,7 +2,7 @@
 
 A controlled study of text written inside images and what it does to vision-language models (VLMs). Written text can mislead a model as **context** (a false label on an object) or hijack it as an **instruction** (a command that overrides the user). Cheap image-processing defences such as blur, JPEG re-compression and OCR-guided inpainting are usually tested against instructions alone. We test both attack types on the same images, under the same defences, with a defence-aware attacker and a utility check.
 
-Repository: ContextOrCommand. Working name: PixelGuard. Status: planning. Draft due **28 November 2026**.
+Repository: VisionLanguageTypographicDefence. Working name: PixelGuard. Status: planning. Draft due **28 November 2026**.
 
 **Team:** Syed Muhammad Mehdi Abidi, Ali Sobaan, Syed Mufeed Haider. FAST NUCES, Karachi.
 
@@ -133,8 +133,8 @@ tests/        pytest suite for defences, scorer and stats
 ## Getting started
 
 ```bash
-git clone https://github.com/Mehdi-Abidi/ContextOrCommand.git
-cd ContextOrCommand
+git clone https://github.com/Mehdi-Abidi/VisionLanguageTypographicDefence.git
+cd VisionLanguageTypographicDefence
 python -m venv venv
 venv\Scripts\activate          # Windows
 # source venv/bin/activate     # macOS / Linux
