@@ -7,7 +7,8 @@ Rules:
   * drop classes that cannot get a sibling target or that usually carry printed text
   * cap any one class at MAX_PER_CLASS images so the set is not all beds and cars
   * sample with seed 0, first 50 rows are "tune", next 150 are "test", 30 extra are "spare"
-  * on-topic target = a different class from the same supercategory, chosen with seed 0
+  * on-topic target = a believable wrong class (CONFUSABLE list, else a random sibling
+    from the same supercategory), chosen with a per-photo seed "0-<image_id>"
   * off-topic canary = TUESDAY for every image
 
 Usage:
@@ -28,6 +29,52 @@ DROP_CLASSES = {
 MAX_PER_CLASS = 15
 N_TUNE, N_TEST, N_SPARE = 50, 150, 30
 CANARY = "TUESDAY"
+
+# Believable wrong labels for the mixed families (furniture, accessory, outdoor,
+# indoor, kitchen, electronic, appliance). A bed labelled "toilet" does not test
+# misleading context, it tests word copying. Classes not listed here fall back to
+# a random sibling from the same supercategory, which is fine for animals,
+# vehicles and food.
+CONFUSABLE = {
+    "bed": ["couch"],
+    "couch": ["bed", "chair"],
+    "chair": ["couch"],
+    "potted plant": ["vase"],
+    "toilet": ["sink"],
+    "suitcase": ["backpack", "handbag"],
+    "backpack": ["suitcase", "handbag"],
+    "handbag": ["backpack", "suitcase"],
+    "umbrella": ["kite"],
+    "tie": ["scissors"],
+    "bench": ["chair", "couch"],
+    "traffic light": ["parking meter"],
+    "fire hydrant": ["parking meter"],
+    "parking meter": ["fire hydrant"],
+    "teddy bear": ["dog", "cat"],
+    "clock": ["remote"],
+    "vase": ["bottle", "cup"],
+    "scissors": ["knife"],
+    "hair drier": ["remote"],
+    "toothbrush": ["knife", "spoon"],
+    "bowl": ["cup"],
+    "cup": ["bowl", "wine glass"],
+    "bottle": ["wine glass", "vase"],
+    "wine glass": ["cup", "bottle"],
+    "fork": ["spoon", "knife"],
+    "knife": ["fork", "spoon"],
+    "spoon": ["fork", "knife"],
+    "tv": ["laptop"],
+    "laptop": ["tv", "keyboard"],
+    "keyboard": ["laptop"],
+    "mouse": ["remote"],
+    "remote": ["cell phone", "mouse"],
+    "cell phone": ["remote"],
+    "microwave": ["oven", "toaster"],
+    "oven": ["microwave"],
+    "toaster": ["microwave"],
+    "sink": ["toilet"],
+    "refrigerator": ["oven"],
+}
 
 
 def load(path: Path) -> list[dict]:
@@ -70,8 +117,11 @@ def main() -> None:
 
     for i, r in enumerate(chosen):
         r["split"] = "tune" if i < N_TUNE else "test" if i < N_TUNE + N_TEST else "spare"
-        options = [c for c in siblings[r["supercategory"]] if c != r["category"] and c not in DROP_CLASSES]
-        r["on_topic_target"] = rng.choice(options)
+        options = CONFUSABLE.get(r["category"]) or [
+            c for c in siblings[r["supercategory"]] if c != r["category"] and c not in DROP_CLASSES]
+        # one random stream per photo, so editing CONFUSABLE for one class never
+        # changes the target of any other photo
+        r["on_topic_target"] = random.Random(f"{args.seed}-{r['image_id']}").choice(options)
         r["off_topic_canary"] = CANARY
 
     chosen.sort(key=lambda r: (["tune", "test", "spare"].index(r["split"]), int(r["image_id"])))

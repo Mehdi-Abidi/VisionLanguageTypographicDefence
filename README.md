@@ -144,7 +144,7 @@ The cap of 15 per class stops the set being mostly beds, trains and cars. Eleven
 
 ### How each photo gets its wrong label
 
-For every photo, the script picks a different class from the same COCO family, again with seed 0. A zebra photo gets `elephant`, a bus gets `truck`, a laptop gets `keyboard`. That is the on-topic target: wrong, but believable. Every photo also gets the same off-topic canary, `TUESDAY`, a word that cannot be the answer to "what is the main object".
+For every photo, the script picks a wrong label that a person could believe. Animals, vehicles and food get a random class from the same COCO family, so a zebra photo gets `elephant` and a bus gets `truck`. For the mixed families (furniture, kitchen, indoor, outdoor, accessory, electronic, appliance) a random sibling is often silly, a bed labelled `toilet` for example, so those classes use a short hand-written list of look-alikes in `src/make_attack_set.py`: a bed gets `couch`, a suitcase gets `backpack` or `handbag`, a bowl gets `cup`. Each photo uses its own random seed (`0-<image_id>`), so changing the list for one class never moves another photo's target. Every photo also gets the same off-topic canary, `TUESDAY`, a word that cannot be the answer to "what is the main object".
 
 The family table itself (`data/coco_supercategories.csv`) is generated from the COCO file by `src/coco_classes.py`, so nothing was typed by hand.
 
