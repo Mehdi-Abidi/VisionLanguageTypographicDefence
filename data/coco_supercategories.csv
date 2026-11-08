@@ -1,0 +1,81 @@
+supercategory,category,coco_id
+accessory,backpack,27
+accessory,umbrella,28
+accessory,handbag,31
+accessory,tie,32
+accessory,suitcase,33
+animal,bird,16
+animal,cat,17
+animal,dog,18
+animal,horse,19
+animal,sheep,20
+animal,cow,21
+animal,elephant,22
+animal,bear,23
+animal,zebra,24
+animal,giraffe,25
+appliance,microwave,78
+appliance,oven,79
+appliance,toaster,80
+appliance,sink,81
+appliance,refrigerator,82
+electronic,tv,72
+electronic,laptop,73
+electronic,mouse,74
+electronic,remote,75
+electronic,keyboard,76
+electronic,cell phone,77
+food,banana,52
+food,apple,53
+food,sandwich,54
+food,orange,55
+food,broccoli,56
+food,carrot,57
+food,hot dog,58
+food,pizza,59
+food,donut,60
+food,cake,61
+furniture,chair,62
+furniture,couch,63
+furniture,potted plant,64
+furniture,bed,65
+furniture,dining table,67
+furniture,toilet,70
+indoor,book,84
+indoor,clock,85
+indoor,vase,86
+indoor,scissors,87
+indoor,teddy bear,88
+indoor,hair drier,89
+indoor,toothbrush,90
+kitchen,bottle,44
+kitchen,wine glass,46
+kitchen,cup,47
+kitchen,fork,48
+kitchen,knife,49
+kitchen,spoon,50
+kitchen,bowl,51
+outdoor,traffic light,10
+outdoor,fire hydrant,11
+outdoor,stop sign,13
+outdoor,parking meter,14
+outdoor,bench,15
+person,person,1
+sports,frisbee,34
+sports,skis,35
+sports,snowboard,36
+sports,sports ball,37
+sports,kite,38
+sports,baseball bat,39
+sports,baseball glove,40
+sports,skateboard,41
+sports,surfboard,42
+sports,tennis racket,43
+vehicle,bicycle,2
+vehicle,car,3
+vehicle,motorcycle,4
+vehicle,airplane,5
+vehicle,bus,6
+vehicle,train,7
+vehicle,truck,8
+vehicle,boat,9
