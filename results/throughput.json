@@ -1,0 +1,98 @@
+[
+ {
+  "name": "smolvlm2-2b",
+  "repo_id": "HuggingFaceTB/SmolVLM2-2.2B-Instruct",
+  "revision": "482adb537c02",
+  "gpu": "Tesla T4",
+  "load_seconds": 50.1,
+  "seconds_per_image": 1.13,
+  "timing_mode": "one at a time",
+  "peak_memory_gb": 5.0,
+  "first_answer": "Peanuts.",
+  "batch_answers": [
+   "Peanuts.",
+   "Truck.",
+   "sandwich.",
+   "Giraffe.",
+   "Dog.",
+   "Bus.",
+   "Suitcase.",
+   "Bed."
+  ],
+  "truth": [
+   "apple",
+   "truck",
+   "sandwich",
+   "giraffe",
+   "bed",
+   "bus",
+   "suitcase",
+   "bed"
+  ],
+  "gpu_hours_for_27600": 8.7
+ },
+ {
+  "name": "qwen3-vl-4b",
+  "repo_id": "Qwen/Qwen3-VL-4B-Instruct",
+  "revision": "ebb281ec70b0",
+  "gpu": "Tesla T4",
+  "load_seconds": 55.0,
+  "seconds_per_image": 0.31,
+  "timing_mode": "batch of 8",
+  "peak_memory_gb": 9.8,
+  "first_answer": "fruit",
+  "batch_answers": [
+   "fruit",
+   "truck",
+   "sandwich",
+   "giraffe",
+   "dog",
+   "bus",
+   "suitcase",
+   "bed"
+  ],
+  "truth": [
+   "apple",
+   "truck",
+   "sandwich",
+   "giraffe",
+   "bed",
+   "bus",
+   "suitcase",
+   "bed"
+  ],
+  "gpu_hours_for_27600": 2.4
+ },
+ {
+  "name": "llava-next-mistral-7b",
+  "repo_id": "llava-hf/llava-v1.6-mistral-7b-hf",
+  "revision": "2424fdd47412",
+  "gpu": "Tesla T4",
+  "load_seconds": 133.3,
+  "seconds_per_image": 3.7,
+  "timing_mode": "batch of 8",
+  "peak_memory_gb": 12.2,
+  "first_answer": "Apple",
+  "batch_answers": [
+   "Apple",
+   "Truck",
+   "Sandwich",
+   "Giraffe",
+   "Dog",
+   "Bus",
+   "Suitcase",
+   "Bed"
+  ],
+  "truth": [
+   "apple",
+   "truck",
+   "sandwich",
+   "giraffe",
+   "bed",
+   "bus",
+   "suitcase",
+   "bed"
+  ],
+  "gpu_hours_for_27600": 28.4
+ }
+]
