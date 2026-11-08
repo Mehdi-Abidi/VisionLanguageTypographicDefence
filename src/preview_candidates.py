@@ -57,6 +57,8 @@ def main() -> None:
         x, y, w, h = (float(r[k]) * scale for k in ("box_x", "box_y", "box_w", "box_h"))
         draw.rectangle([x, y, x + w, y + h], outline="red", width=3)
         label = f'{r["category"]} {float(r["box_area_fraction"]):.0%}'
+        if "on_topic_target" in r:
+            label = f'{r["category"]} -> {r["on_topic_target"]} ({r["split"]})'
         draw.rectangle([0, 0, 8 + draw.textlength(label, font=font), 22], fill="black")
         draw.text((4, 3), label, fill="white", font=font)
         sheet.paste(im, ((i % cols) * TILE, (i // cols) * TILE))
