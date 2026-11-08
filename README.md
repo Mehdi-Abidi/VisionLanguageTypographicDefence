@@ -115,6 +115,64 @@ Plus three controls per image: clean, neutral random letters the length of the l
 
 The full ticket list with dates, steps and dependencies is in [docs/task-board.md](docs/task-board.md) (also as [PDF](docs/task-board.pdf)).
 
+## Progress so far
+
+Tickets A1 and A2 are done. This section says what was done, where the data came from, and how 5,000 photos became 200.
+
+### Where the data comes from
+
+COCO is a public set of photos with labels. Each photo comes with a list of the objects in it and a box around each one. We use the 2017 validation split, which has 5,000 photos.
+
+| What | Where | Size | Kept in git? |
+| --- | --- | --- | --- |
+| Object labels and boxes | `http://images.cocodataset.org/annotations/annotations_trainval2017.zip`, file `annotations/instances_val2017.json` inside the zip | 241 MB zip, 20 MB file | No. It goes under `data/raw/`, which `.gitignore` skips |
+| The photos | `http://images.cocodataset.org/val2017/<file_name>` for one photo, or `val2017.zip` for all 5,000 | 1 GB | No. Fetched one at a time for previews, downloaded in full only for rendering (A3) |
+
+A1 and A2 need only the labels file. The photos are not downloaded until A3.
+
+### How 5,000 photos became 200
+
+| Step | Rule | Photos left | Script |
+| --- | --- | --- | --- |
+| Start | COCO val2017 | 5,000 | |
+| A1 | Find the largest object box in each photo. Keep the photo if that box covers at least 20% of the picture | 2,833 | `src/pick_images.py` |
+| A2 | Drop four classes: `person` (the only class in its family, so no wrong-but-similar label exists), `dining table` (its box is usually a plate of food), `stop sign` and `book` (they always carry printed text) | 1,669 | `src/make_attack_set.py` |
+| A2 | Shuffle with seed 0. Take photos in that order, but never more than 15 of one class, until 230 are picked | 230 | `src/make_attack_set.py` |
+| A2 | First 50 are `tune` (for the attacker search), next 150 are `test` (for every reported number), last 30 are `spare` (to swap in if a photo turns out to have real text on it) | 50 + 150 + 30 | `src/make_attack_set.py` |
+
+The cap of 15 per class stops the set being mostly beds, trains and cars. Eleven of the twelve COCO families end up represented.
+
+### How each photo gets its wrong label
+
+For every photo, the script picks a different class from the same COCO family, again with seed 0. A zebra photo gets `elephant`, a bus gets `truck`, a laptop gets `keyboard`. That is the on-topic target: wrong, but believable. Every photo also gets the same off-topic canary, `TUESDAY`, a word that cannot be the answer to "what is the main object".
+
+The family table itself (`data/coco_supercategories.csv`) is generated from the COCO file by `src/coco_classes.py`, so nothing was typed by hand.
+
+### Files produced
+
+| File | Rows | What is in it |
+| --- | --- | --- |
+| `data/coco_candidates.csv` | 2,833 | Every photo that passed A1, with the class, family, box position and box size |
+| `data/coco_supercategories.csv` | 80 | Every COCO class and its family |
+| `data/attack_set.csv` | 230 | The chosen photos with `split`, `on_topic_target` and `off_topic_canary` |
+| `data/targets.csv` | 230 | The short version: photo, split, true class, family, target, canary |
+
+### How to check it
+
+`notebooks/check_a1_a2.ipynb` runs on Colab. Upload it, then upload the four CSV files when asked. It checks the row counts, redoes the A1 selection from the raw COCO file with different code, redoes the A2 sampling and compares the photo ids, checks every target is a sibling class, and shows a sample of photos with their boxes and targets. Each check prints OK or says what is wrong.
+
+To see photos locally without downloading COCO:
+
+```
+python src/preview_candidates.py                                            # 24 random A1 photos with boxes
+python src/preview_candidates.py --csv data/attack_set.csv --seed 1         # 24 A2 photos with their targets
+```
+
+### Known things to fix in the pilot
+
+- A few photos have a large box that is not the obvious subject. One "bed" photo is really two dogs on a bed. A model will say "dog", which counts as wrong on the clean question. The pilot gate checks clean accuracy for this reason. Photos that fail get swapped for spares.
+- A few photos already contain printed text in the background. When EasyOCR is installed (A5), the 200 are scanned and any photo with readable text is swapped for a spare.
+
 ## Repository layout
 
 ```
