@@ -63,7 +63,7 @@ The aim of these two days is to agree on every file name and format, so the thre
 
 **Steps**
 
-1. Create a private GitHub repo called `pixelguard`. Add all three as collaborators.
+1. The private GitHub repo is `Mehdi-Abidi/ContextOrCommand`. Mehdi adds the other two as collaborators.
 2. Create these folders in the repo: `data/`, `configs/`, `src/`, `manifests/`, `runs/`, `results/`, `notebooks/`, `paper/`.
 3. Agree the JSONL row format for model outputs. Write it in the README. Suggested fields: `image_id`, `cell`, `setting`, `defence`, `model`, `revision`, `prompt`, `output`, `config_hash`, `seed`, `timestamp`.
 4. Agree the manifest columns: `image_id`, `cell`, `setting`, `defence`, `path`.
