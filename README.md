@@ -148,6 +148,8 @@ Rendered images, COCO and TextVQA live in a shared Kaggle dataset, not in this r
 
 | File | What it is |
 | --- | --- |
+| [docs/README.md](docs/README.md) | Reading order, lanes, key dates and team rules |
+| [docs/research-plan.md](docs/research-plan.md) | The research plan by Ali Sobaan: claim, 2x2 design, hypotheses, method, risks and paper outline |
 | [docs/evaluation-and-proposal.md](docs/evaluation-and-proposal.md) | Evaluation of the research plan, the problem statement, abstract, architecture, revised compute budget and verified references |
 | [docs/task-board.md](docs/task-board.md) | 40 tickets across three lanes with dates, steps, dependencies and the two gates |
 | [docs/architecture/](docs/architecture/) | Pipeline diagram as PNG, SVG and an editable Excalidraw file |
