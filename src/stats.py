@@ -59,6 +59,8 @@ def paired_bootstrap_auc(strengths, c, i, n_boot=10000, seed=0):
     c, i = np.asarray(c, float), np.asarray(i, float)
     if c.shape != i.shape:
         raise ValueError("c and i must have the same shape")
+    if not (c[:, 0].any() and i[:, 0].any()):
+        raise ValueError("a cell has no undefended successes, so retained success is undefined")
     diff = float(_retained(strengths, i.mean(0)) - _retained(strengths, c.mean(0)))
     idx = np.random.default_rng(seed).integers(0, len(c), (n_boot, len(c)))
     cm, im = c[idx].mean(1), i[idx].mean(1)  # (n_boot, n_strengths): the same rows drawn for both cells

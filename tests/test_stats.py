@@ -54,3 +54,19 @@ def test_bootstrap_same_seed_same_answer():
     rng = np.random.default_rng(1)
     c, i = rng.integers(0, 2, (30, 4)), rng.integers(0, 2, (30, 4))
     assert paired_bootstrap_auc([0, 1, 2, 3], c, i, n_boot=200) == paired_bootstrap_auc([0, 1, 2, 3], c, i, n_boot=200)
+
+
+def test_bootstrap_p_between_zero_and_one():
+    # Only 3 of 30 images lose success at the last strength, so diff = -0.05. A resample shows no drop only if it
+    # misses all 3: P = (27/30)^30 = 0.0424, so p = 2 * 0.0424 = 0.0848.
+    c = np.ones((30, 4))
+    i = c.copy()
+    i[:3, 3] = 0
+    diff, _, p, _ = paired_bootstrap_auc([0, 1, 2, 3], c, i)
+    assert diff == pytest.approx(-0.05)
+    assert p == pytest.approx(0.0848, abs=0.01)
+
+
+def test_bootstrap_cell_with_no_undefended_success():
+    with pytest.raises(ValueError, match="no undefended successes"):
+        paired_bootstrap_auc([0, 1, 2, 3], np.ones((10, 4)), np.zeros((10, 4)))
