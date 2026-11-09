@@ -353,6 +353,16 @@ python src/run_model.py --model qwen3-vl-4b --manifest manifests/pilot.csv     -
 
 `notebooks/b3_run_model_kaggle.ipynb` is the real test on Kaggle. It clones the repo with a read-only GitHub token kept in Kaggle's Secrets, builds a 10-row manifest from tuning photos, runs all three models and checks every JSONL file with `pandas.read_json(lines=True)`.
 
+Run on a Kaggle T4 on 9 November 2026 (`transformers` 5.22.2). All three models wrote 10 valid rows with the agreed fields, and running Qwen3-VL a second time wrote nothing, because every row was already done. SmolVLM ran in batches without falling back, so the per-prompt image fix works.
+
+| Model | Load (incl. download) | Seconds per image, 10 photos | Clean answers right, strict match |
+| --- | --- | --- | --- |
+| smolvlm2-2b | 63 s | 1.44 | 4 of 10 |
+| qwen3-vl-4b | 66 s | 0.58 | 4 of 10 |
+| llava-next-mistral-7b | 135 s | 2.91 | 4 of 10 |
+
+The speeds include warm-up on only 10 photos, so the B2 numbers stay the planning figures. Most "wrong" clean answers are fair names the scorer has to accept: computer for laptop, jet for airplane, bike for bicycle, burger or fries for sandwich. Two tuning photos show something else as the main subject. In photo 4795 (tv) all three models answered "cat", and in photo 42178 (couch) two of them answered "man". Both go on the pilot-gate list with the other ambiguous photos.
+
 ## Data formats (agreed in ALL-1)
 
 Two files tie the lanes together. The renderer (lane A) writes the manifest, the model runner (lane B) reads it and writes JSONL, and the scorer (lane C) reads the JSONL. Nobody changes these without telling the other two.
