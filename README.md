@@ -249,6 +249,38 @@ python src/render.py --ids 9914,42178                               # chosen pho
 
 Checked on 9 November 2026: 5 photos gave 40 files. The text was readable and sat on the object in all of them, and the 32 px low-contrast corner run stayed inside the frame. The rendered PNGs are not committed. They go to the Kaggle dataset in A6.
 
+### The image defences (ticket A4)
+
+`src/defences.py` holds the cheap defences that run on a photo after the text is written and before a model sees it. Each one takes a photo as a NumPy array (height x width x 3, RGB, values 0 to 255) and gives back a photo of the same size and type. The names match the `defence` column of the manifest.
+
+| Name | What it does |
+| --- | --- |
+| `none` | Nothing. The photo goes to the model as it is |
+| `blur_s1`, `blur_s2`, `blur_s3` | Gaussian blur with sigma 1, 2 or 3 px. Bigger sigma means more blur |
+| `median_5` | Each pixel becomes the middle value of the 5 x 5 square around it. Removes thin strokes and specks |
+| `jpeg_q50`, `jpeg_q20`, `jpeg_q10` | Saves the photo as a JPEG at quality 50, 20 or 10 in memory and opens it again. Lower quality throws away more detail |
+| `bits_3` | Keeps 8 shades per colour channel instead of 256 |
+| `downup_05` | Shrinks the photo to half size and stretches it back with bilinear resizing |
+
+Here they are on the I-off version of the burger photo, cropped to the middle so the text is easy to see:
+
+![Ten defence settings on one photo](docs/figures/defence_examples.png)
+
+Even on one photo there is something to notice. The median filter breaks the 16 px letters more than mild blur does, and some letters of "TUESDAY" fall apart. JPEG at quality 10 ruins the burger but leaves the text easy to read. Whether models see it the same way is what the pilot will measure.
+
+**One change from the ticket.** The ticket says "divide by 32, round, multiply by 32" for 3 bits. Rounding 255 / 32 gives 8, and 8 x 32 = 256, which does not fit in a byte and wraps to 0. So white pixels would turn black. The code instead maps 0 to 255 onto 8 evenly spaced shades (0, 36, 73, ..., 255). This is the bit-depth squeezing from the feature-squeezing paper (Xu et al., 2018).
+
+**Two smaller details.** OpenCV stores colour as BGR, not RGB, so the JPEG step swaps the channels before saving and swaps them back after. Otherwise the JPEG colour maths would treat red as blue. And no defence changes the photo it is given. Each one returns a new array.
+
+**Tests.** `tests/test_defences.py` has 54 small tests. They check that every defence keeps the shape and type on three photo sizes (landscape, portrait and an odd 513 x 513), never changes its input, and really changes the photo (except `none`). They also check that `bits_3` leaves exactly 8 shades, that more blur and lower JPEG quality move the photo further from the original, and that an unknown name raises an error.
+
+```
+pytest tests/                                                       # 54 passed
+python src/defences.py images/9914_i_off_font16_high_object.png     # all ten settings on one photo, saved to results/
+```
+
+The OCR and inpainting defence (`ocr_inpaint`) is ticket A5 and goes into the same file.
+
 ## Data formats (agreed in ALL-1)
 
 Two files tie the lanes together. The renderer (lane A) writes the manifest, the model runner (lane B) reads it and writes JSONL, and the scorer (lane C) reads the JSONL. Nobody changes these without telling the other two.
