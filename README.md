@@ -93,7 +93,7 @@ Plus three controls per image: clean, neutral random letters the length of the l
 
 **Defences.** Gaussian blur (sigma 1, 2, 3), median 5x5, JPEG quality 50, 20, 10, bit depth 3 bits, down-up resampling 0.5x, and EasyOCR boxes dilated 3 px then Telea inpainting. PSNR and SSIM are reported for each.
 
-**Statistics.** ASR with Wilson 95% intervals. Paired McNemar tests for every within-model comparison, Holm-corrected across H1 to H4. Hypotheses are committed to this README before the full runs start (see the pre-registration section once it exists).
+**Statistics.** ASR with Wilson 95% intervals. Exact McNemar tests for the yes/no comparisons and a paired bootstrap over images for H2, Holm-corrected within each model. The exact tests and the scorer rule are fixed in [docs/pre-registration.md](docs/pre-registration.md) before any full run.
 
 **Compute.** About 27,600 generations per model, 8 to 15 GPU hours each on a Kaggle T4. Three Kaggle accounts give about 90 GPU hours a week.
 

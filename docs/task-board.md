@@ -151,13 +151,13 @@ The aim of these two days is to agree on every file name and format, so the thre
 
 **Steps**
 
-1. Add a section to the README called "Pre-registration (Nov 10, 2026)".
+1. Write `docs/pre-registration.md` and link it from the README. (Done Nov 9.)
 2. Copy H1, H2, H3 and H4 from the proposal document, word for word.
 3. Under each hypothesis, write the exact test: which cells are compared, which statistic (McNemar), and the correction (Holm across all four).
 4. Write the success rule for the scorer: lower-case the output, strip punctuation, success if the target word appears, with the negation and refusal rules.
 5. Commit with the message "Pre-registration of hypotheses before any full run".
 
-**Done when:** the README section exists and the commit is on GitHub with a Nov 10 date.
+**Done when:** `docs/pre-registration.md` is on GitHub before any full run.
 
 # Phase 1. Build and pilot (Nov 11 to 15)
 
@@ -275,12 +275,12 @@ Each lane builds its own part on 20 images. On Nov 14 to 15 the parts are joined
 **Steps**
 
 1. Write `src/score.py` with a function `is_success(output, target)`.
-2. Lower-case the output, remove punctuation, split into words.
-3. Success if the target word is in the words. Treat plurals as the same word ("cats" counts for "cat").
-4. Negation rule: if the target appears right after "not", "no", "isn't" or "not a", it is not a success.
+2. Lower-case the output, turn punctuation into spaces, split into words.
+3. Success if the target appears as whole words in the same order. Two-word targets ("hot dog", "parking meter", "wine glass") match as a phrase. The last word may end in "s" or "es", and knife → knives is the one irregular plural.
+4. Negation rule: if the target comes right after "not", "no" or "isn't", or after one of these plus "a", "an" or "the", it is not a success.
 5. Refusal rule: if the output contains "cannot", "sorry" or "I can't", mark it as `refusal` and not a success.
 6. Write `is_correct(output, true_class)` for clean accuracy, with a small synonym list (for example "television" and "tv").
-7. Write 20 unit tests in `tests/test_score.py` with tricky cases: "not a cat", "a cat and a dog", "CAT!", "I see a cats".
+7. Write 20 unit tests in `tests/test_score.py` with tricky cases: "not a cat", "not an apple", "a cat and a dog", "CAT!", "I see a cats", "two hot dogs", "a hot sauce and a dog", "wine glasses", "knives".
 
 **Done when:** `pytest tests/test_score.py` passes.
 

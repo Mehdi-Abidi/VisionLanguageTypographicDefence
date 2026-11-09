@@ -119,7 +119,7 @@ Watch-outs:
 
 ## 5. Open questions for the team (decide before C2 on Nov 10)
 
-1. **H1 contrast.** Keep H1 as C-on vs I-off (role and topic differ), or pre-register the clean role contrast C-on vs I-on as well? Prior evidence suggests I-on may win.
-2. **Default font size.** Keep 16 px (3% of the short side) with the pilot fallback to 24 px, or start at 24–32 px (5–6%) to match prior work?
+1. **H1 contrast.** Keep H1 as C-on vs I-off (role and topic differ), or pre-register the clean role contrast C-on vs I-on as well? Prior evidence suggests I-on may win. **Decided:** both, as H1a and H1b in `docs/pre-registration.md`.
+2. **Default font size.** Keep 16 px (3% of the short side) with the pilot fallback to 24 px, or start at 24–32 px (5–6%) to match prior work? **Decided:** 16 px, with the switch to 24 px allowed only at the pilot gate (see `docs/pre-registration.md`).
 3. **Who fixes the docs.** Items 1–8 and 13–17 in §3.1 change wording in Mehdi's proposal and in Related Work (B11). Agree at kickoff who edits what.
 4. **Weekly re-search** (Nov 15): add "typographic defense JPEG" and "OCR inpainting prompt injection" to the queries.
