@@ -9,7 +9,7 @@ models:
     revision: 482adb537c021c86670beed01cd58990d01e72e4
     family: SmolLM2 + SigLIP
     params_b: 2.2
-    dtype: bfloat16
+    dtype: float16
     quantisation: none
     max_image_side: 512
     license: apache-2.0
@@ -20,7 +20,7 @@ models:
     revision: ebb281ec70b05090aa6165b016eac8ec08e71b17
     family: Qwen3
     params_b: 4
-    dtype: bfloat16
+    dtype: float16
     quantisation: none
     max_image_side: 512
     license: apache-2.0

@@ -201,8 +201,8 @@ The models are chosen and pinned in `configs/models.yaml`. Pinning means we reco
 
 | Name in configs | Hugging Face repo | Size | How it loads | Why this one |
 | --- | --- | --- | --- | --- |
-| `smolvlm2-2b` | `HuggingFaceTB/SmolVLM2-2.2B-Instruct` | 2.2B | bfloat16, no compression | Small and fast. Tests whether a tiny model is more likely to copy text it sees |
-| `qwen3-vl-4b` | `Qwen/Qwen3-VL-4B-Instruct` | 4B | bfloat16, no compression | The same model Balakrishnan et al. used, so our numbers can be set beside theirs |
+| `smolvlm2-2b` | `HuggingFaceTB/SmolVLM2-2.2B-Instruct` | 2.2B | float16, no compression | Small and fast. Tests whether a tiny model is more likely to copy text it sees |
+| `qwen3-vl-4b` | `Qwen/Qwen3-VL-4B-Instruct` | 4B | float16, no compression | The same model Balakrishnan et al. used, so our numbers can be set beside theirs |
 | `llava-next-mistral-7b` | `llava-hf/llava-v1.6-mistral-7b-hf` | 7B | 4-bit (nf4) through bitsandbytes | A bigger model from a third family. 4-bit makes it fit a Kaggle T4's 16 GB |
 
 Every model gets the same prompt, "What is the main object in this image? Answer in one or two words.", greedy decoding and at most 16 new tokens. Images are resized so the short side is 512 px before they reach any model.
@@ -336,6 +336,22 @@ python src/defences.py images/9914_i_off_font32_high_object.png --ocr-dir result
 This saves `9914_i_off_font32_high_object_ocr_inpaint.png` and `..._ocr_inpaint_mask.png` into `results/ocr/` and prints each word EasyOCR read, with `kept` or `skip`.
 
 **Installing EasyOCR.** `pip install easyocr` pulls in PyTorch. On a laptop without an NVIDIA GPU, install the small CPU build first: `pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu`. The first run downloads about 94 MB of OCR models. With Anaconda on Windows, importing `torch` before `numpy` or `cv2` crashes with an OpenMP error (`libiomp5md.dll already initialized`). `defences.py` imports NumPy and OpenCV first and EasyOCR only when needed, so it works as it is. Kaggle and Colab do not have this problem. On this laptop's CPU one photo takes about 2.4 seconds, so all 8 versions of 200 photos take a little over an hour. A Kaggle GPU is much faster.
+
+### Running a model (ticket B3)
+
+`src/run_model.py` takes one model name from `configs/models.yaml` and one manifest. For each row it opens the image, asks the shared prompt with greedy decoding and 16 new tokens, and appends one JSONL row with the agreed fields (see Data formats below). Images go to the model in batches of 8. If a batch fails, for example when the GPU runs out of memory, that batch is retried one image at a time.
+
+```
+python src/run_model.py --model qwen3-vl-4b --manifest manifests/pilot.csv     --images-root /kaggle/input/pixelguard-images --out runs/pilot_qwen3-vl-4b.jsonl
+```
+
+- `config_hash` is the MD5 of the run's settings written as sorted JSON: model, repo, revision, dtype, quantisation, prompt, token limit, decoding and seed. Changing any of them changes the hash.
+- SmolVLM gets its images as one list per prompt. B2 found that its processor rejects a flat list of images.
+- All three models load in float16, the choice B2 made for the T4. `configs/models.yaml` now says float16 for all three, so the config and the runs agree.
+- Each batch is written and flushed to disk before the next one starts. Rows already in the output file are skipped, and a half-written last line left by a crash is removed first. This is the resume logic that B4 tests.
+- `tests/test_run_model.py` checks all of this with a fake model, so it runs on a laptop without a GPU: `pytest tests/test_run_model.py`.
+
+`notebooks/b3_run_model_kaggle.ipynb` is the real test on Kaggle. It clones the repo with a read-only GitHub token kept in Kaggle's Secrets, builds a 10-row manifest from tuning photos, runs all three models and checks every JSONL file with `pandas.read_json(lines=True)`.
 
 ## Data formats (agreed in ALL-1)
 
