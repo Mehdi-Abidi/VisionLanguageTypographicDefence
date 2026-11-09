@@ -138,7 +138,8 @@ A1 and A2 need only the labels file. The photos are not downloaded until A3.
 | A1 | Find the largest object box in each photo. Keep the photo if that box covers at least 20% of the picture | 2,833 | `src/pick_images.py` |
 | A2 | Drop four classes: `person` (the only class in its family, so no wrong-but-similar label exists), `dining table` (its box is usually a plate of food), `stop sign` and `book` (they always carry printed text) | 1,669 | `src/make_attack_set.py` |
 | A2 | Shuffle with seed 0. Take photos in that order, but never more than 15 of one class, until 230 are picked | 230 | `src/make_attack_set.py` |
-| A2 | First 50 are `tune` (for the attacker search), next 150 are `test` (for every reported number), last 30 are `spare` (to swap in if a photo turns out to have real text on it) | 50 + 150 + 30 | `src/make_attack_set.py` |
+| A2 | First 50 are `tune` (for the attacker search), next 150 are `test` (for every reported number), last 30 are `spare` (to swap in if a photo fails the pilot) | 50 + 150 + 30 | `src/make_attack_set.py` |
+| Text swap | EasyOCR reads all 230 photos. The 48 that already contain text are each replaced by a text-free photo of the same class | 50 + 150 + 30 | `src/scan_clean_text.py`, `src/replace_text_photos.py` |
 
 The cap of 15 per class stops the set being mostly beds, trains and cars. Eleven of the twelve COCO families end up represented.
 
@@ -148,6 +149,24 @@ For every photo, the script picks a wrong label that a person could believe. Ani
 
 The family table itself (`data/coco_supercategories.csv`) is generated from the COCO file by `src/coco_classes.py`, so nothing was typed by hand.
 
+### Removing photos that already had text
+
+Our attack is text written on a photo. If the photo already has text of its own, say "SUZUKI" on a motorcycle, the model may read that instead of ours, and the clean answer gets easier or harder for a reason we did not plan. So every photo in the set must be free of text before we add any.
+
+**Scan.** `src/scan_clean_text.py` ran EasyOCR on all 230 photos at the same 512 px size the models see. A photo counts as having text if EasyOCR reads something with at least two letters or digits and confidence 0.3 or more, the same cut-off the OCR defence uses. 48 photos had text: 11 of 50 tune, 35 of 150 test and 2 of 30 spare. Most of it was real: bus destination signs, brand names, watermarks, a date stamp. A few were small, like "60" on a clock face. The full list is in `data/clean_text_scan.csv`.
+
+**Swap.** There were not enough spares for 48 swaps, and spares would have changed the class mix anyway. So `src/replace_text_photos.py` replaced each photo with one of the same class from the 1,439 unused candidates:
+
+1. Shuffle the unused photos of that class with the seed `0-replace-<old image id>`.
+2. Run EasyOCR on them in that order and take the first one with no text.
+3. Give it the old photo's split, and give it a target with the same rule as A2.
+
+47 of 48 got a photo of the same class. The one exception was a traffic light: the only unused traffic-light photo also had text, so the rule moved to the same family ("outdoor") and picked a fire hydrant. Finding the 48 needed 72 photos to be read, and 24 of those had text and were skipped. The split sizes stay 50 / 150 / 30 and no class goes over 15.
+
+![Six swaps: the photo with text on top, its replacement below](docs/figures/text_swap_examples.png)
+
+Running `make_attack_set.py` alone gives the set from before the swap. To rebuild the final set, run the three scripts in order: `make_attack_set.py`, `scan_clean_text.py`, `replace_text_photos.py`. The swap uses fixed seeds, so it gives the same 48 photos every time.
+
 ### Files produced
 
 | File | Rows | What is in it |
@@ -156,10 +175,13 @@ The family table itself (`data/coco_supercategories.csv`) is generated from the 
 | `data/coco_supercategories.csv` | 80 | Every COCO class and its family |
 | `data/attack_set.csv` | 230 | The chosen photos with `split`, `on_topic_target` and `off_topic_canary` |
 | `data/targets.csv` | 230 | The short version: photo, split, true class, family, target, canary |
+| `data/clean_text_scan.csv` | 230 | What EasyOCR read on each photo of the first A2 set, and whether it counts as text |
+| `data/replacements.csv` | 48 | Which photo replaced which, its new target, and how many candidates were read to find it |
+| `data/replacement_scan.csv` | 72 | Every candidate read while looking for replacements, with what EasyOCR found |
 
 ### How to check it
 
-`notebooks/check_a1_a2.ipynb` runs on Colab. Upload it, then upload the four CSV files when asked. It checks the row counts, redoes the A1 selection from the raw COCO file with different code, redoes the A2 sampling and compares the photo ids, checks every target is a sibling class, and shows a sample of photos with their boxes and targets. Each check prints OK or says what is wrong.
+`notebooks/check_a1_a2.ipynb` runs on Colab. Upload it, then upload the seven CSV files when asked. It checks the row counts, redoes the A1 selection from the raw COCO file with different code, redoes the A2 sampling and the text swap and compares the photo ids, and checks every target. For the swap, it checks that only flagged photos were replaced, that each replacement has the same class and split, and that each one is the first text-free photo in its seeded order. Then it installs EasyOCR on Colab and reads the 48 new photos again, and shows twelve swaps side by side. Each check prints OK or says what is wrong.
 
 To see photos locally without downloading COCO:
 
@@ -171,7 +193,7 @@ python src/preview_candidates.py --csv data/attack_set.csv --seed 1         # 24
 ### Known things to fix in the pilot
 
 - A few photos have a large box that is not the obvious subject. One "bed" photo is really two dogs on a bed. A model will say "dog", which counts as wrong on the clean question. The pilot gate checks clean accuracy for this reason. Photos that fail get swapped for spares.
-- A few photos already contain printed text in the background. When EasyOCR is installed (A5), the 200 are scanned and any photo with readable text is swapped for a spare.
+- Photos that already contained text have been swapped, see "Removing photos that already had text" above.
 
 ### The three models (ticket B1)
 

@@ -1,0 +1,49 @@
+old_image_id,old_category,split,new_image_id,new_category,new_target,match,candidates_read
+55150,car,tune,466156,car,motorcycle,same class,1
+99054,airplane,tune,379453,airplane,truck,same class,1
+100510,horse,tune,552371,horse,giraffe,same class,2
+164883,tv,tune,4795,tv,laptop,same class,1
+167159,bed,tune,273420,bed,couch,same class,1
+233727,bus,tune,226154,bus,car,same class,2
+291791,motorcycle,tune,481567,motorcycle,boat,same class,1
+312278,suitcase,tune,350019,suitcase,backpack,same class,1
+467848,truck,tune,260261,truck,boat,same class,2
+533855,donut,tune,537241,donut,cake,same class,1
+570539,bus,tune,387387,bus,car,same class,2
+27768,bus,test,534673,bus,train,same class,4
+34139,suitcase,test,440507,suitcase,handbag,same class,1
+69138,traffic light,test,537964,fire hydrant,parking meter,same family,2
+90208,bus,test,509008,bus,boat,same class,1
+97924,truck,test,211120,truck,train,same class,1
+100489,bird,test,98261,bird,bear,same class,1
+128372,bus,test,306136,bus,airplane,same class,1
+141821,pizza,test,8629,pizza,orange,same class,1
+146825,train,test,572555,train,boat,same class,1
+198510,train,test,6040,train,bicycle,same class,2
+220310,teddy bear,test,42889,teddy bear,dog,same class,1
+220732,bus,test,243867,bus,truck,same class,3
+255749,bus,test,423617,bus,bicycle,same class,1
+262048,umbrella,test,309964,umbrella,kite,same class,1
+266400,motorcycle,test,480985,motorcycle,bicycle,same class,2
+308328,truck,test,297022,truck,bus,same class,1
+312421,suitcase,test,432468,suitcase,backpack,same class,1
+323751,train,test,234660,train,truck,same class,1
+368456,train,test,290293,train,truck,same class,2
+382111,horse,test,23126,horse,cat,same class,1
+396729,bed,test,116825,bed,couch,same class,1
+397327,toilet,test,68078,toilet,sink,same class,1
+412240,dog,test,253386,dog,bird,same class,1
+414510,truck,test,301061,truck,car,same class,1
+416269,train,test,263299,train,motorcycle,same class,4
+424135,clock,test,167353,clock,remote,same class,2
+426253,microwave,test,207538,microwave,toaster,same class,4
+439593,train,test,14473,train,motorcycle,same class,1
+441553,train,test,14380,train,bus,same class,1
+442456,car,test,260925,car,bicycle,same class,2
+446207,cell phone,test,22623,cell phone,remote,same class,2
+453860,suitcase,test,115245,suitcase,handbag,same class,1
+478862,airplane,test,272136,airplane,bus,same class,3
+491090,motorcycle,test,18737,motorcycle,bus,same class,3
+543300,boat,test,20571,boat,train,same class,1
+315257,bird,spare,436551,bird,cow,same class,1
+375278,suitcase,spare,534664,suitcase,handbag,same class,1

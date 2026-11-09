@@ -1,0 +1,73 @@
+image_id,category,has_text,words
+466156,car,0,
+379453,airplane,0,
+191288,horse,1,Net (0.88) | Geknet (0.76) | cek net (0.31) | Knet (0.57)
+552371,horse,0,
+4795,tv,0,
+273420,bed,0,
+365655,bus,1,BReWSTEK (0.35) | ICE ExPLORER (0.68) | CANADA (1.00)
+226154,bus,0,
+481567,motorcycle,0,
+350019,suitcase,0,
+76417,truck,1,Vus (0.35)
+260261,truck,0,
+537241,donut,0,
+274272,bus,1,70 (1.00) | 70 (1.00) | PRERAYONLYMZO (0.91)
+387387,bus,0,
+303305,bus,1,613 (1.00) | MTS (0.99) | System (1.00) | Transit (1.00) | Metropolitan (0.98)
+347544,bus,1,LUKSUSBUSS (0.87) | KJOLESKAP (0.98) | VIDEO (1.00) | KAFFEBAR (1.00) | TOALETT (0.99) | TELSEA EREMS (0.52) | VOEVO (0.54) | BIDM~ (0.55)
+534673,bus,0,
+440507,suitcase,0,
+361103,traffic light,1,Ecarphone (0.56) | Warehouse (0.77)
+537964,fire hydrant,0,
+509008,bus,0,
+211120,truck,0,
+98261,bird,0,
+306136,bus,0,
+8629,pizza,0,
+572555,train,0,
+249643,train,1,425 613-7 (0.98)
+6040,train,0,
+42889,teddy bear,0,
+338625,bus,1,m23 (0.34) | 5279 (1.00)
+243867,bus,0,
+423617,bus,0,
+309964,umbrella,0,
+144300,motorcycle,1,Eriba-Tor (0.83) | HONDA (0.99)
+480985,motorcycle,0,
+297022,truck,0,
+432468,suitcase,0,
+234660,train,0,
+66135,train,1,86902 (1.00)
+290293,train,0,
+23126,horse,0,
+116825,bed,0,
+68078,toilet,0,
+253386,dog,0,
+301061,truck,0,
+82085,train,1,bohemiantraveler.com (0.95)
+493566,train,1,77344 (0.48) | BNSE (0.94)
+379800,train,1,1803 (0.99) | 1803 (0.82) | STOPI (0.41)
+263299,train,0,
+164363,clock,1,Dutck (0.96) | Jcluport (0.64)
+167353,clock,0,
+199681,microwave,1,2.46 (0.98)
+319696,microwave,1,8882 (0.94) | 8000 (0.91) | 8988 (0.40)
+160556,microwave,1,(uegos (0.50)
+207538,microwave,0,
+14473,train,0,
+14380,train,0,
+215723,car,1,700 (1.00) | Wernick 0800 (0.99) | HIRE (0.99)
+260925,car,0,
+300039,cell phone,1,PAUL (0.53)
+22623,cell phone,0,
+115245,suitcase,0,
+502599,airplane,1,US: AIR FORCEI (0.32) | N4339 (0.99)
+167540,airplane,1,Daniele Nicolucci (0.48)
+272136,airplane,0,
+194875,motorcycle,1,WVBOROWA (0.61)
+457848,motorcycle,1,2013 JDZ adon (0.70)
+18737,motorcycle,0,
+20571,boat,0,
+436551,bird,0,
+534664,suitcase,0,
