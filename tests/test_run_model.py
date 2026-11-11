@@ -115,3 +115,56 @@ def test_output_text_is_written_unchanged(setup):
     out = tmp / "test.jsonl"
     run(rows[:1], lambda ims: ["Ein Café, “cat”!"], out, tmp, meta, log=lambda *_: None)
     assert json.loads(out.read_text(encoding="utf-8"))["output"] == "Ein Café, “cat”!"
+
+
+WORKER = """
+import sys, time
+sys.path.insert(0, sys.argv[1])
+from pathlib import Path
+from run_model import read_manifest, run
+
+def slow_model(images):
+    time.sleep(0.25)
+    return ["dog"] * len(images)
+
+meta = {"model": "fake", "revision": "000000000000", "prompt": "p", "config_hash": "h", "seed": 0}
+run(read_manifest(Path(sys.argv[2])), slow_model, Path(sys.argv[3]), Path(sys.argv[4]), meta, batch_size=8, log=lambda *_: None)
+"""
+
+
+def test_kill_after_20_rows_and_restart_gives_50_unique_rows(tmp_path):
+    import csv
+    import subprocess
+    import time
+
+    (tmp_path / "images").mkdir()
+    rows = []
+    for k in range(50):
+        path = f"images/{k}_clean_none.png"
+        Image.new("RGB", (8, 8)).save(tmp_path / path)
+        rows.append({"image_id": k, "cell": "clean", "setting": "none", "defence": "none", "path": path})
+    manifest, out = tmp_path / "manifest.csv", tmp_path / "run.jsonl"
+    with open(manifest, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
+    src = str(Path(__file__).resolve().parents[1] / "src")
+    command = [sys.executable, "-c", WORKER, src, str(manifest), str(out), str(tmp_path)]
+
+    def lines():
+        return len(out.read_text(encoding="utf-8").splitlines()) if out.exists() else 0
+
+    first = subprocess.Popen(command)
+    deadline = time.time() + 60
+    while lines() < 20 and time.time() < deadline:
+        time.sleep(0.02)
+    first.kill()
+    first.wait()
+    stopped_at = lines()
+    assert 20 <= stopped_at < 50
+
+    subprocess.run(command, check=True, timeout=60)
+    df = pd.read_json(out, lines=True)
+    assert len(df) == 50
+    assert not df.duplicated(["image_id", "cell", "setting", "defence"]).any()
+    assert sorted(df["image_id"]) == list(range(50))

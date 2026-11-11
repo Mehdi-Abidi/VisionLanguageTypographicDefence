@@ -363,6 +363,13 @@ Run on a Kaggle T4 on 9 November 2026 (`transformers` 5.22.2). All three models 
 
 The speeds include warm-up on only 10 photos, so the B2 numbers stay the planning figures. Most "wrong" clean answers are fair names the scorer has to accept: computer for laptop, jet for airplane, bike for bicycle, burger or fries for sandwich. Two tuning photos show something else as the main subject. In photo 4795 (tv) all three models answered "cat", and in photo 55528 (couch) two of them answered "man". Both go on the pilot-gate list with the other ambiguous photos.
 
+### Stopping and restarting a run (ticket B4)
+
+The runner already does the three B4 steps: it reads the output JSONL first, skips every `(image_id, cell, setting, defence)` in it, and flushes the file to disk after every batch of 8, so a crash loses at most one batch. Two tests check that a real crash is survived:
+
+- `tests/test_run_model.py::test_kill_after_20_rows_and_restart_gives_50_unique_rows` starts a 50-row run in a separate process with a slow fake model, kills the process once 20 rows are on disk, starts it again and checks for exactly 50 unique rows. It passed 6 times out of 6 on this laptop.
+- `notebooks/b4_resume_kaggle.ipynb` does the same on a Kaggle T4 with Qwen3-VL and the 50 tuning photos.
+
 ## Data formats (agreed in ALL-1)
 
 Two files tie the lanes together. The renderer (lane A) writes the manifest, the model runner (lane B) reads it and writes JSONL, and the scorer (lane C) reads the JSONL. Nobody changes these without telling the other two.
