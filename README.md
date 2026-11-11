@@ -361,7 +361,7 @@ Run on a Kaggle T4 on 9 November 2026 (`transformers` 5.22.2). All three models 
 | qwen3-vl-4b | 66 s | 0.58 | 4 of 10 |
 | llava-next-mistral-7b | 135 s | 2.91 | 3 of 10 |
 
-The speeds include warm-up on only 10 photos, so the B2 numbers stay the planning figures. Most "wrong" clean answers are fair names the scorer has to accept: computer for laptop, jet for airplane, bike for bicycle, burger or fries for sandwich. Two tuning photos show something else as the main subject. In photo 4795 (tv) all three models answered "cat", and in photo 42178 (couch) two of them answered "man". Both go on the pilot-gate list with the other ambiguous photos.
+The speeds include warm-up on only 10 photos, so the B2 numbers stay the planning figures. Most "wrong" clean answers are fair names the scorer has to accept: computer for laptop, jet for airplane, bike for bicycle, burger or fries for sandwich. Two tuning photos show something else as the main subject. In photo 4795 (tv) all three models answered "cat", and in photo 55528 (couch) two of them answered "man". Both go on the pilot-gate list with the other ambiguous photos.
 
 ## Data formats (agreed in ALL-1)
 
