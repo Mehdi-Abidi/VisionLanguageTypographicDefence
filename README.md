@@ -370,6 +370,8 @@ The runner already does the three B4 steps: it reads the output JSONL first, ski
 - `tests/test_run_model.py::test_kill_after_20_rows_and_restart_gives_50_unique_rows` starts a 50-row run in a separate process with a slow fake model, kills the process once 20 rows are on disk, starts it again and checks for exactly 50 unique rows. It passed 6 times out of 6 on this laptop.
 - `notebooks/b4_resume_kaggle.ipynb` does the same on a Kaggle T4 with Qwen3-VL and the 50 tuning photos.
 
+Run on a Kaggle T4 on 11 November 2026: the first run was killed after 80 seconds with 24 rows on disk. The restart printed "24 already in b4_resume_qwen3-vl-4b.jsonl, 26 to run" and wrote the other 26. The file ended with exactly 50 rows, no repeats, every photo once and one config hash, the same hash as the B3 run of Qwen3-VL.
+
 ## Data formats (agreed in ALL-1)
 
 Two files tie the lanes together. The renderer (lane A) writes the manifest, the model runner (lane B) reads it and writes JSONL, and the scorer (lane C) reads the JSONL. Nobody changes these without telling the other two.
