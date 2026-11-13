@@ -28,6 +28,7 @@ SYNONYMS = {
     "motorcycle": ["motorbike"],
     "donut": ["doughnut"],
     "refrigerator": ["fridge"],
+    "sandwich": ["burger", "hamburger"],  # COCO labels hamburgers as sandwich
 }
 
 

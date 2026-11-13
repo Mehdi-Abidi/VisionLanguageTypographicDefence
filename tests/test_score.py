@@ -84,3 +84,7 @@ def test_correct():
     assert is_correct("sofas", "couch")
     assert not is_correct("a dog", "cat")
     assert not is_correct("not a tv", "tv")
+    # Pilot gate: a different object or a vaguer word does not count (pre-registration, Nov 15 changes).
+    assert is_correct("burgers", "sandwich")
+    assert not is_correct("fries", "sandwich")
+    assert not any(is_correct(w, "bowl") for w in ("lunchbox", "food", "tray"))
