@@ -442,7 +442,9 @@ What we take from it: the models answer the question about the photo and leave o
 | Strong defences | default and `font24_high_object` | blur sigma 1, 2, 3, JPEG 50, 20, 10, OCR-inpaint | 105 |
 | Other defences | default | median, bit depth, down-up | 24 |
 
-That gives 35,800 rows and about 11 GB of images. A 2-photo test on a laptop gave 358 rows with no files missing. The 48 files that also exist from the pilot came out byte for byte the same. The notebook writes `full.csv`, the images and `ocr_masks.zip` to `/kaggle/working`. That output becomes the `pixelguard-full` dataset the full runs read. The full-run notebooks ask for that dataset. `full.csv` is committed as `manifests/full.csv`.
+A 2-photo test on a laptop gave 358 rows with no files missing. The 48 files that also exist from the pilot came out byte for byte the same. The notebook writes `full.csv`, the images and `ocr_masks.zip` to `/kaggle/working`. That output becomes the `pixelguard-full` dataset the full runs read. The full-run notebooks ask for that dataset.
+
+**Run on a Kaggle T4 on 14 November 2026**, at commit `0d79c95`, after the two photo swaps. 200 photos gave 35,800 manifest rows and 35,800 images, with 0 files missing. Rendering took 26 minutes and the 25,800 defended files took 67 minutes. The images take 16.0 GB, more than the 11 GB guessed from the 2-photo test, and still under Kaggle's 20 GB output limit. The 3,000 OCR masks are in `ocr_masks.zip`. The run is saved in `notebooks/a7_render_full_kaggle.ipynb`. `manifests/full.csv` was rebuilt on a laptop from the same code and commit. It has 35,800 rows and 200 photos, includes the two new photos and leaves out the two swapped ones.
 
 ### Full runs (tickets B6 and B7)
 
@@ -463,6 +465,16 @@ Each person runs their copy on their own Kaggle account, because the GPU hours c
 - **Output.** Each part is a file such as `sweep_smolvlm2-2b_part1of2.jsonl`. Mehdi joins the parts into `runs/sweep_{model}.jsonl` and `runs/defence_{model}.jsonl`.
 
 The notebook was tested on the pilot manifest and on a made-up manifest of 28,800 rows with a fake model. The two parts of a 19,200 row sweep joined back into exactly 19,200 rows with no repeats.
+
+What each person runs on the real `manifests/full.csv`, at the B5 speeds:
+
+| Who | Model | B6 rendering sweep | B7 defence sweep | GPU hours |
+| --- | --- | --- | --- | --- |
+| Mehdi | smolvlm2-2b | 10,000 rows, 1 part | 25,800 rows, 3 parts | about 15.4 |
+| Mufeed | qwen3-vl-4b | 10,000 rows, 1 part | 25,800 rows, 2 parts | about 7.5 |
+| Ali Soban | llava-next-mistral-7b, default rendering only | 1,600 rows, 1 part | 16,000 rows, 5 parts | about 23.7 |
+
+That is about 46.5 GPU hours in total. Each account stays under Kaggle's 30 hours a week.
 
 ### Figure 1 (ticket C6)
 
