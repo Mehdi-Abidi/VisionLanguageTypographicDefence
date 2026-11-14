@@ -446,6 +446,8 @@ A 2-photo test on a laptop gave 358 rows with no files missing. The 48 files tha
 
 **Run on a Kaggle T4 on 14 November 2026**, at commit `0d79c95`, after the two photo swaps. 200 photos gave 35,800 manifest rows and 35,800 images, with 0 files missing. Rendering took 26 minutes and the 25,800 defended files took 67 minutes. The images take 16.0 GB, more than the 11 GB guessed from the 2-photo test, and still under Kaggle's 20 GB output limit. The 3,000 OCR masks are in `ocr_masks.zip`. The run is saved in `notebooks/a7_render_full_kaggle.ipynb`. `manifests/full.csv` was rebuilt on a laptop from the same code and commit. It has 35,800 rows and 200 photos, includes the two new photos and leaves out the two swapped ones.
 
+That first run used Run All in the editor, and Kaggle does not keep the files of an editor session, so it could not become a dataset. A7 was run a second time with Save Version, Save & Run All, at commit `01108f3`. It gave the same numbers: 35,800 rows, 0 files missing, 16.0 GB. Its `full.csv` is byte for byte the same as the committed `manifests/full.csv`, so rendering the set twice gives the same manifest. The version's output, `images/`, `full.csv` and `ocr_masks.zip` (3,000 masks, 2.2 MB), becomes the `pixelguard-full` dataset. The masks stay on Kaggle and are not in git. The second run is the one saved in `notebooks/a7_render_full_kaggle.ipynb`.
+
 ### Full runs (tickets B6 and B7)
 
 Each person has their own copy of the notebook, with their model already set:
