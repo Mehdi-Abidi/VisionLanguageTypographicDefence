@@ -117,7 +117,7 @@ The full ticket list with dates, steps and dependencies is in [docs/task-board.m
 
 ## Progress so far
 
-Tickets A1 and A2 are done. This section says what was done, where the data came from, and how 5,000 photos became 200.
+Status on 14 November 2026: phase 0 and phase 1 are done (ALL-1, A1 to A6, B1 to B5, C1 to C6), the pilot gate decisions are written down, and A7 has rendered the full set. Next are the full runs, B6 and B7. This section says what was done, where the data came from, and how 5,000 photos became 200.
 
 ### Where the data comes from
 
