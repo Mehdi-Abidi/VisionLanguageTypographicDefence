@@ -434,7 +434,7 @@ Most sampled rows are easy, because attacks rarely worked in the pilot: only 16 
 | Strong defences | default and `font24_high_object` | blur sigma 1, 2, 3, JPEG 50, 20, 10, OCR-inpaint | 105 |
 | Other defences | default | median, bit depth, down-up | 24 |
 
-That gives 35,800 rows and about 11 GB of images. A 2-photo test on a laptop gave 358 rows with no files missing. The 48 files that also exist from the pilot came out byte for byte the same. The notebook writes `full.csv`, the images and `ocr_masks.zip` to `/kaggle/working`. That output becomes the `pixelguard-full` dataset the full runs read. `full.csv` is committed as `manifests/full.csv`.
+That gives 35,800 rows and about 11 GB of images. A 2-photo test on a laptop gave 358 rows with no files missing. The 48 files that also exist from the pilot came out byte for byte the same. The notebook writes `full.csv`, the images and `ocr_masks.zip` to `/kaggle/working`. That output becomes the `pixelguard-full` dataset the full runs read. The full-run notebooks ask for that dataset. `full.csv` is committed as `manifests/full.csv`.
 
 ### Full runs (tickets B6 and B7)
 
