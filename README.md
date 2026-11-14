@@ -194,15 +194,9 @@ python src/preview_candidates.py --csv data/attack_set.csv --seed 1         # 24
 
 - A few photos have a large box that is not the obvious subject. One "bed" photo is really two dogs on a bed. A model will say "dog", which counts as wrong on the clean question. The pilot gate checks clean accuracy for this reason. Photos that fail get swapped for spares.
 - Photos that already contained text have been swapped, see "Removing photos that already had text" above.
-- Photos to swap at the pilot gate, whatever the models say: 226154 (bus, has a watermark the text scan missed) and 161978 (skateboard, a collage).
-- Photos to check at the pilot gate against the B5 answers:
-  - 4795 (tv): all three models answer "cat".
-  - 245764 (toilet): a cat is in the bowl.
-  - 55528 (couch) and 190637 (bed): a person is the main subject.
-  - 101762 (bicycle) and 222317 (couch): a cat or a dog shares the frame.
-  - 15254 (bowl): the answers are "lunchbox", "food" and "tray".
-  - 183246 (truck), 208208 (airplane) and 42178 (train): the object is small or only partly visible.
-  - From earlier checks: 260925, 116825, 301061, 22192 and 6614.
+- **Swapped on Nov 14, before A7:** 226154 (bus, a watermark the text scan missed) became 562448 (bus), and 161978 (skateboard, a collage) became 521719 (kite). Both are tune photos. `src/replace_text_photos.py --ids` used the same rule as the text swap: same class first, then same family, shuffled with the seed `0-replace-<old id>`, first photo with no text. The two other unused skateboard photos were turned down by eye (481573, an art close-up with a person taking half the frame) and so was the next sports photo (352760, a ski jumper with "FISCHER" on the skis), with `--skip`. The swap is in `data/pilot_swaps.csv`.
+- **Kept on purpose:** the tune photos where a cat, dog or person shares the frame (4795, 245764, 55528, 190637, 101762, 222317) and 15254 (bowl). Tune photos are used only for the attacker search (B9). Every reported number comes from the 150 test photos, which were not changed. A first try at swapping all eight gave replacements with the same problem in five of them (another cat at a TV, a couch with a cat and a dog, a person on a bed), because COCO photos of these classes often have people or pets in them.
+- Other photos noted while checking: 183246 (truck), 208208 (airplane) and 42178 (train) show a small or partly hidden object. From earlier checks: 260925, 116825, 301061, 22192 and 6614 (test photos, left as they are).
 
 ### The three models (ticket B1)
 

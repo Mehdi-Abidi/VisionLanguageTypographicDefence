@@ -8,14 +8,12 @@ image_id,file_name,split,category,supercategory,on_topic_target,off_topic_canary
 55528,000000055528.jpg,tune,couch,furniture,chair,TUESDAY
 101762,000000101762.jpg,tune,bicycle,vehicle,train,TUESDAY
 131386,000000131386.jpg,tune,airplane,vehicle,truck,TUESDAY
-161978,000000161978.jpg,tune,skateboard,sports,frisbee,TUESDAY
 183246,000000183246.jpg,tune,truck,vehicle,train,TUESDAY
 183437,000000183437.jpg,tune,elephant,animal,dog,TUESDAY
 190637,000000190637.jpg,tune,bed,furniture,couch,TUESDAY
 206411,000000206411.jpg,tune,toilet,furniture,sink,TUESDAY
 208208,000000208208.jpg,tune,airplane,vehicle,motorcycle,TUESDAY
 222317,000000222317.jpg,tune,couch,furniture,bed,TUESDAY
-226154,000000226154.jpg,tune,bus,vehicle,car,TUESDAY
 233033,000000233033.jpg,tune,umbrella,accessory,kite,TUESDAY
 245764,000000245764.jpg,tune,toilet,furniture,sink,TUESDAY
 248810,000000248810.jpg,tune,giraffe,animal,zebra,TUESDAY
@@ -41,6 +39,7 @@ image_id,file_name,split,category,supercategory,on_topic_target,off_topic_canary
 481567,000000481567.jpg,tune,motorcycle,vehicle,boat,TUESDAY
 490413,000000490413.jpg,tune,airplane,vehicle,train,TUESDAY
 503823,000000503823.jpg,tune,boat,vehicle,car,TUESDAY
+521719,000000521719.jpg,tune,kite,sports,snowboard,TUESDAY
 530466,000000530466.jpg,tune,train,vehicle,boat,TUESDAY
 531036,000000531036.jpg,tune,bus,vehicle,train,TUESDAY
 537241,000000537241.jpg,tune,donut,food,cake,TUESDAY
@@ -48,6 +47,7 @@ image_id,file_name,split,category,supercategory,on_topic_target,off_topic_canary
 542625,000000542625.jpg,tune,car,vehicle,train,TUESDAY
 548555,000000548555.jpg,tune,hot dog,food,apple,TUESDAY
 552371,000000552371.jpg,tune,horse,animal,giraffe,TUESDAY
+562448,000000562448.jpg,tune,bus,vehicle,boat,TUESDAY
 562843,000000562843.jpg,tune,cup,kitchen,wine glass,TUESDAY
 6040,000000006040.jpg,test,train,vehicle,bicycle,TUESDAY
 6614,000000006614.jpg,test,apple,food,sandwich,TUESDAY

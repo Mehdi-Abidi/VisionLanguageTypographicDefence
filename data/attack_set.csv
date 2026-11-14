@@ -8,14 +8,12 @@ image_id,file_name,width,height,category,supercategory,box_x,box_y,box_w,box_h,b
 55528,000000055528.jpg,640,480,couch,furniture,2.1,70.0,637.9,410.0,0.8514,tune,chair,TUESDAY
 101762,000000101762.jpg,640,480,bicycle,vehicle,41.5,0.0,472.9,344.8,0.5308,tune,train,TUESDAY
 131386,000000131386.jpg,640,427,airplane,vehicle,151.6,206.1,339.0,174.8,0.2169,tune,truck,TUESDAY
-161978,000000161978.jpg,640,433,skateboard,sports,15.5,47.9,522.1,315.4,0.5943,tune,frisbee,TUESDAY
 183246,000000183246.jpg,500,400,truck,vehicle,215.6,0.0,284.4,400.0,0.5687,tune,train,TUESDAY
 183437,000000183437.jpg,427,640,elephant,animal,61.8,283.3,322.2,338.0,0.3984,tune,dog,TUESDAY
 190637,000000190637.jpg,428,640,bed,furniture,1.7,147.7,426.3,483.7,0.7529,tune,couch,TUESDAY
 206411,000000206411.jpg,640,480,toilet,furniture,172.6,0.9,298.8,359.2,0.3494,tune,sink,TUESDAY
 208208,000000208208.jpg,640,480,airplane,vehicle,267.4,0.7,372.6,240.5,0.2918,tune,motorcycle,TUESDAY
 222317,000000222317.jpg,640,480,couch,furniture,98.1,96.3,541.9,378.8,0.6683,tune,bed,TUESDAY
-226154,000000226154.jpg,640,507,bus,vehicle,145.8,104.8,385.1,278.0,0.3299,tune,car,TUESDAY
 233033,000000233033.jpg,640,480,umbrella,accessory,135.1,97.8,338.4,237.8,0.262,tune,kite,TUESDAY
 245764,000000245764.jpg,640,480,toilet,furniture,270.9,14.6,312.1,465.4,0.4727,tune,sink,TUESDAY
 248810,000000248810.jpg,375,500,giraffe,animal,62.3,131.0,237.2,336.6,0.4258,tune,zebra,TUESDAY
@@ -41,6 +39,7 @@ image_id,file_name,width,height,category,supercategory,box_x,box_y,box_w,box_h,b
 481567,000000481567.jpg,640,480,motorcycle,vehicle,210.8,132.5,191.8,324.6,0.2027,tune,boat,TUESDAY
 490413,000000490413.jpg,640,238,airplane,vehicle,8.7,45.9,627.9,165.2,0.6811,tune,train,TUESDAY
 503823,000000503823.jpg,500,333,boat,vehicle,186.3,110.8,313.7,147.4,0.2777,tune,car,TUESDAY
+521719,000000521719.jpg,427,640,kite,sports,250.8,230.0,165.9,369.3,0.2241,tune,snowboard,TUESDAY
 530466,000000530466.jpg,640,480,train,vehicle,1.1,0.0,638.9,451.6,0.9392,tune,boat,TUESDAY
 531036,000000531036.jpg,480,640,bus,vehicle,151.3,54.9,325.8,392.3,0.4161,tune,train,TUESDAY
 537241,000000537241.jpg,640,427,donut,food,130.2,24.9,415.5,368.6,0.5604,tune,cake,TUESDAY
@@ -48,6 +47,7 @@ image_id,file_name,width,height,category,supercategory,box_x,box_y,box_w,box_h,b
 542625,000000542625.jpg,640,480,car,vehicle,286.8,221.9,353.2,256.8,0.2953,tune,train,TUESDAY
 548555,000000548555.jpg,640,426,hot dog,food,0.3,0.3,625.2,425.7,0.9761,tune,apple,TUESDAY
 552371,000000552371.jpg,640,426,horse,animal,288.9,2.5,351.1,418.6,0.5391,tune,giraffe,TUESDAY
+562448,000000562448.jpg,640,480,bus,vehicle,25.8,165.5,446.7,141.8,0.2061,tune,boat,TUESDAY
 562843,000000562843.jpg,500,375,cup,kitchen,213.2,8.4,273.9,225.0,0.3287,tune,wine glass,TUESDAY
 6040,000000006040.jpg,640,351,train,vehicle,63.1,84.4,537.9,222.4,0.5326,test,bicycle,TUESDAY
 6614,000000006614.jpg,500,396,apple,food,18.6,40.5,463.9,211.0,0.4943,test,sandwich,TUESDAY

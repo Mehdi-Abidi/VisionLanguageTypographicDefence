@@ -10,6 +10,10 @@ data/replacement_scan.csv (every candidate that was read, with what OCR found).
 
 Usage:
     python src/replace_text_photos.py
+    python src/replace_text_photos.py --ids 226154,161978 --replacements-out data/pilot_swaps.csv         --scan-out data/pilot_swap_scan.csv
+
+--ids swaps the listed photos instead of the ones the text scan flagged, with the same rule.
+--skip leaves out candidates that were checked by eye and turned down.
 """
 import argparse
 import csv
@@ -44,10 +48,17 @@ def main() -> None:
     parser.add_argument("--cache", type=Path, default=Path("data/raw/val2017"))
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--min-letters", type=int, default=2)
+    parser.add_argument("--ids", default=None)
+    parser.add_argument("--skip", default="")
+    parser.add_argument("--replacements-out", type=Path, default=Path("data/replacements.csv"))
+    parser.add_argument("--scan-out", type=Path, default=Path("data/replacement_scan.csv"))
     args = parser.parse_args()
 
     attack = load(args.attack_set)
-    flagged_ids = {r["image_id"] for r in load(args.scan) if r["has_text"] == "1"}
+    if args.ids:
+        flagged_ids = set(args.ids.split(","))
+    else:
+        flagged_ids = {r["image_id"] for r in load(args.scan) if r["has_text"] == "1"}
     to_replace = [r for r in attack if r["image_id"] in flagged_ids]
     if not to_replace:
         print("no flagged photo is in the attack set, nothing to replace")
@@ -58,7 +69,9 @@ def main() -> None:
         siblings[r["supercategory"]].append(r["category"])
 
     used = {r["image_id"] for r in attack}
-    pool = [r for r in load(args.candidates) if r["category"] not in DROP_CLASSES and r["image_id"] not in used]
+    skip = set(filter(None, args.skip.split(",")))
+    pool = [r for r in load(args.candidates)
+            if r["category"] not in DROP_CLASSES and r["image_id"] not in used and r["image_id"] not in skip]
     per_class = Counter(r["category"] for r in attack if r["image_id"] not in flagged_ids)
     scanned = {}
     scan_log, replacements = [], []
@@ -115,8 +128,8 @@ def main() -> None:
     save(Path("data/targets.csv"), [
         {k: r[k] for k in ("image_id", "file_name", "split", "category", "supercategory",
                            "on_topic_target", "off_topic_canary")} for r in attack])
-    save(Path("data/replacements.csv"), replacements)
-    save(Path("data/replacement_scan.csv"), scan_log)
+    save(args.replacements_out, replacements)
+    save(args.scan_out, scan_log)
 
     print(f"\nreplaced {len(replacements)} photos, read {len(scan_log)} candidates, "
           f"{sum(r['has_text'] for r in scan_log)} of them had text")
