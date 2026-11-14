@@ -424,6 +424,18 @@ All three are above the 95% needed for the pilot gate, so `score.py` needs no ch
 
 Most sampled rows are easy, because attacks rarely worked in the pilot: only 16 of the 300 rows are successes. So the audit says more about the scorer's "fail" and clean verdicts than about its "success" ones.
 
+### Rendering the full set (ticket A7)
+
+`notebooks/a7_render_full_kaggle.ipynb` renders the 200 tune and test photos on Kaggle and applies the defences, using `render.py`, `defences.py` and `make_manifest.py` unchanged. Per photo it makes 179 manifest rows:
+
+| Part | Settings | Defences | Rows per photo |
+| --- | --- | --- | --- |
+| Rendering sweep | default `font16_high_object`, plus font 8, 12, 24, 32 px, low contrast, corner | none | 50 |
+| Strong defences | default and `font24_high_object` | blur sigma 1, 2, 3, JPEG 50, 20, 10, OCR-inpaint | 105 |
+| Other defences | default | median, bit depth, down-up | 24 |
+
+That gives 35,800 rows and about 11 GB of images. A 2-photo test on a laptop gave 358 rows with no files missing. The 48 files that also exist from the pilot came out byte for byte the same. The notebook writes `full.csv`, the images and `ocr_masks.zip` to `/kaggle/working`. That output becomes the `pixelguard-full` dataset the full runs read. `full.csv` is committed as `manifests/full.csv`.
+
 ### Full runs (tickets B6 and B7)
 
 Each person has their own copy of the notebook, with their model already set:
