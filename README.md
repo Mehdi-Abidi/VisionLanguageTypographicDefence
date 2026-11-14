@@ -426,7 +426,15 @@ Most sampled rows are easy, because attacks rarely worked in the pilot: only 16 
 
 ### Full runs (tickets B6 and B7)
 
-`notebooks/b6_b7_full_run_kaggle.ipynb` is one notebook for both tickets. Each person runs it on their own Kaggle account, because the GPU hours count against whoever starts the session. At the top you set four values: the model, the sweep (`rendering` for B6, `defence` for B7), the part number, and whether to keep only the default rendering.
+Each person has their own copy of the notebook, with their model already set:
+
+| Notebook | Who runs it | Model |
+| --- | --- | --- |
+| `notebooks/full_run_mehdi_smolvlm2-2b.ipynb` | Mehdi | smolvlm2-2b |
+| `notebooks/full_run_mufeed_qwen3-vl-4b.ipynb` | Mufeed | qwen3-vl-4b |
+| `notebooks/full_run_ali_llava-next-mistral-7b.ipynb` | Ali Soban | llava-next-mistral-7b, default rendering only (B2) |
+
+Each person runs their copy on their own Kaggle account, because the GPU hours count against whoever starts the session. At the top they set the sweep (`rendering` for B6, then `defence` for B7) and the part number. All three copies share the same code. Only the title, `MODEL` and `ONLY_DEFAULT_SETTING` differ.
 
 - **Parts.** The notebook splits the sweep into parts of about 5 hours, using the speeds measured in B5. Kaggle stops a session at 12 hours, so a part never gets cut off, and a failed part costs at most 5 hours to redo. The split is fixed by the manifest and the model, so part 2 is always the same rows.
 - **Runs in the background.** After checking the plan it prints, use Save Version, then Save & Run All. The browser can be closed.
