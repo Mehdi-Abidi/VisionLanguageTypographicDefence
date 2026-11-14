@@ -424,6 +424,18 @@ All three are above the 95% needed for the pilot gate, so `score.py` needs no ch
 
 Most sampled rows are easy, because attacks rarely worked in the pilot: only 16 of the 300 rows are successes. So the audit says more about the scorer's "fail" and clean verdicts than about its "success" ones.
 
+### Full runs (tickets B6 and B7)
+
+`notebooks/b6_b7_full_run_kaggle.ipynb` is one notebook for both tickets. Each person runs it on their own Kaggle account, because the GPU hours count against whoever starts the session. At the top you set four values: the model, the sweep (`rendering` for B6, `defence` for B7), the part number, and whether to keep only the default rendering.
+
+- **Parts.** The notebook splits the sweep into parts of about 5 hours, using the speeds measured in B5. Kaggle stops a session at 12 hours, so a part never gets cut off, and a failed part costs at most 5 hours to redo. The split is fixed by the manifest and the model, so part 2 is always the same rows.
+- **Runs in the background.** After checking the plan it prints, use Save Version, then Save & Run All. The browser can be closed.
+- **LLaVA uses batch size 1**, because batch 8 ran out of memory in the pilot.
+- **Checks.** At the end it checks the part's file: every row, the agreed fields, no repeats and one config hash.
+- **Output.** Each part is a file such as `sweep_smolvlm2-2b_part1of2.jsonl`. Mehdi joins the parts into `runs/sweep_{model}.jsonl` and `runs/defence_{model}.jsonl`.
+
+The notebook was tested on the pilot manifest and on a made-up manifest of 28,800 rows with a fake model. The two parts of a 19,200 row sweep joined back into exactly 19,200 rows with no repeats.
+
 ## Data formats (agreed in ALL-1)
 
 Two files tie the lanes together. The renderer (lane A) writes the manifest, the model runner (lane B) reads it and writes JSONL, and the scorer (lane C) reads the JSONL. Nobody changes these without telling the other two.
