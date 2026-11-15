@@ -499,6 +499,14 @@ What each person runs on the real `manifests/full.csv`, at the B5 speeds:
 
 That is about 46.5 GPU hours in total. Each account stays under Kaggle's 30 hours a week.
 
+Progress of the full runs:
+
+| File | Rows | Run | Checks |
+| --- | --- | --- | --- |
+| `runs/sweep_smolvlm2-2b.jsonl` | 10,000 | Kaggle T4, 15 Nov 2026, 1.34 s per image, about 3.8 hours | All rows of the sweep, agreed fields, no repeats, one config hash (`f58543b7…`, the same as the pilot), no empty answers |
+
+The SmolVLM sweep ran with `transformers` 5.23.0, while the pilot used 5.22.2, because the notebook installed the newest version. On the 144 rows that are in both the pilot and the sweep, the same images give the same answers in both, so the version change did not change any answer. The full-run notebooks now install exactly 5.23.0, so every later part uses the same version. 15 SmolVLM answers are longer than five words, all the same habit as in the pilot: the object name, then "Rationale: The main object is …".
+
 ### Figure 1 (ticket C6)
 
 ![The 8 versions of photo 183246 with each model's answer](paper/figures/fig1_example.png)
