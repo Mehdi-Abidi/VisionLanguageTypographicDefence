@@ -538,6 +538,19 @@ Every full run gives the same answers as the pilot on the images both have: 144 
 
 The SmolVLM sweep ran with `transformers` 5.23.0, while the pilot used 5.22.2, because the notebook installed the newest version. On the 144 rows that are in both the pilot and the sweep, the same images give the same answers in both, so the version change did not change any answer. The full-run notebooks now install exactly 5.23.0, so every later part uses the same version. 15 SmolVLM answers are longer than five words, all the same habit as in the pilot: the object name, then "Rationale: The main object is …".
 
+### Utility runs (ticket B8)
+
+B8 asks each model the TextVQA questions from A8 on all 2,200 utility images. Each row gets its own question, so `run_model.py` has a `--questions` option: it reads `data/textvqa_set.csv` and writes each question into this prompt, the usual short-answer wording for TextVQA:
+
+```
+{question}
+Answer the question using a single word or phrase.
+```
+
+The JSONL `prompt` field holds the full question for that row. The template replaces the shared prompt in the config hash, so utility runs have their own hash. For Qwen that is `25ac4ddb…`, against `0930bfbd…` for its COCO runs. Three new tests in `tests/test_run_model.py` check that each row gets its own question, that the one-image-at-a-time fallback keeps the right question with the right image, and that the hash changes.
+
+The full-run notebooks take `SWEEP = 'utility'`, with the `pixelguard-utility` dataset added as Input. At B5 speeds that is one part per model: about 0.5 hours for Qwen, 0.9 for SmolVLM and 3.0 for LLaVA. The clean COCO photos under every defence, the other half of B8 step 1, are already in the B7 defence files, because `manifests/full.csv` has the clean photo under all 11 defence settings.
+
 ### Figure 1 (ticket C6)
 
 ![The 8 versions of photo 183246 with each model's answer](paper/figures/fig1_example.png)
