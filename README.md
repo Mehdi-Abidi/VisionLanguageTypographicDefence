@@ -476,13 +476,16 @@ That second run still could not become the dataset. Kaggle keeps only about 500 
 1. It reads the TextVQA 0.5.1 validation questions (5,000 questions on 3,166 images, 3.1 MB of JSON).
 2. It keeps questions whose majority answer, over the 10 human answers, is one word or a number. That leaves 3,229 questions on 2,420 images. Ties go to the answer that comes first alphabetically.
 3. It sorts them by question id, shuffles them with seed 0, and keeps the first question of each image until it has 200. So the 200 questions are on 200 different images.
-4. Each image is resized to a 512 px short side, the same size as the attack photos, so a defence of a given strength does the same thing to both. It then goes through the same 11 defence settings as A7.
+4. While walking that order it skips questions whose majority answer is "unanswerable". Annotators use that word when the text cannot be read, so it is not an answer a model can get right, and it would count as a miss under every defence alike. Skipping them in the walk, not before the shuffle, keeps the order of every other question the same.
+5. Each image is resized to a 512 px short side, the same size as the attack photos, so a defence of a given strength does the same thing to both. It then goes through the same 11 defence settings as A7.
 
 `data/textvqa_set.csv` has one row per question: the question id (used as `image_id`), the TextVQA image id, the question, all 10 human answers as JSON, the majority answer and the original size. `manifests/utility.csv` has 2,200 rows in the agreed manifest format, with cell `textvqa` and setting `none`, so the model runner reads it like any other manifest.
 
 The TextVQA image zip is 7.07 GB. The script does not download it. It reads the zip's file list and the 200 images it needs with HTTP range requests, about the size of the images themselves. A test on 3 questions took 34 seconds and showed that text stays readable at 512 px ("UMD" on a shirt, "Instalando" on a screen, "BAYONETTA" on a game cover). OCR-inpainting removed "Instalando" but not the two styled logos, which is the kind of reading cost H4 measures. `tests/test_make_textvqa_set.py` checks the answer rule, the one-question-per-image rule and the manifest paths.
 
 `notebooks/a8_textvqa_kaggle.ipynb` makes the 2,200 images on Kaggle without a GPU and packs them into `images_utility.zip` (about 800 MB), with `ocr_masks_utility.zip`, `textvqa_set.csv` and `utility.csv` next to it. That output becomes the `pixelguard-utility` dataset. The notebook also checks that it picked the same 200 questions as the committed CSVs.
+
+The first Kaggle run (16 Nov 2026, CPU, 18 minutes) made all 2,200 images with none missing, and its `textvqa_set.csv` matched git. Its own check printed a problem only because the script wrote Windows line endings, which git on Linux reads as a change. The script now writes plain newlines and the check compares content. That run's set had 5 questions with the majority answer "unanswerable" (38108, 37563, 35601, 38044, 38421), which led to rule 4. With it, those 5 are replaced by the next 5 in the seeded order (36392 shorts brand, 36408 bridge, 37308 coin currency, 35398 wine, 38823 phone brand) and the other 195 stay the same. A8 is run again to make the images for the final set. 13 of the 200 questions have "yes" or "no" as the majority answer. They fit the ticket's one-word rule and are kept.
 
 ### Full runs (tickets B6 and B7)
 
