@@ -1,7 +1,9 @@
 """Ticket A8. Pick 200 TextVQA questions and make the utility set that B8 runs.
 
 Picks questions from the TextVQA 0.5.1 validation set whose majority answer is one word or a
-number, shuffles them with the seed, and keeps one question per image until it has 200. Each
+number, shuffles them with the seed, and walks that order keeping one question per image until it
+has 200. Questions whose majority answer is "unanswerable" are skipped in the walk, so they do not
+change the shuffled order of the others. Each
 image is resized to a 512 px short side, the same size as the attack photos, and passed through
 every defence used in A7. Paths follow make_manifest.py with cell "textvqa" and setting "none".
 
@@ -35,6 +37,7 @@ DEFENCES = ["none", "blur_s1", "blur_s2", "blur_s3", "jpeg_q50", "jpeg_q20", "jp
             "median_5", "bits_3", "downup_05"]
 CELL, SETTING = "textvqa", "none"
 SHORT_SIDE = 512
+NO_ANSWER = {"unanswerable"}
 
 
 class RangeFile(io.RawIOBase):
@@ -97,6 +100,8 @@ def pick(questions: list, n: int, seed: int) -> list:
     random.Random(seed).shuffle(eligible)
     chosen, seen = [], set()
     for q in eligible:
+        if majority(q["answers"]) in NO_ANSWER:
+            continue
         if q["image_id"] not in seen:
             seen.add(q["image_id"])
             chosen.append(q)

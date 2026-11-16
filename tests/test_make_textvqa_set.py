@@ -28,6 +28,14 @@ def test_pick_keeps_one_question_per_image_and_only_one_word_answers():
     assert pick(questions, 10, 0) == chosen
 
 
+def test_unanswerable_is_skipped_without_changing_the_others():
+    questions = [q(k, f"img{k}", ["unanswerable"] if k % 3 == 0 else ["yes"]) for k in range(1, 31)]
+    chosen = pick(questions, 30, 0)
+    assert all(c["question_id"] % 3 for c in chosen)
+    plain = pick([x for x in questions if x["question_id"] % 3], 30, 0)
+    assert {c["question_id"] for c in chosen} == {c["question_id"] for c in plain}
+
+
 def test_manifest_has_every_defence_for_every_question():
     rows = manifest_rows([q(7, "a", ["yes"])])
     assert [r["defence"] for r in rows] == DEFENCES
