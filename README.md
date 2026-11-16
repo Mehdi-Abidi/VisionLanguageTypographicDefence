@@ -504,6 +504,9 @@ Progress of the full runs:
 | File | Rows | Run | Checks |
 | --- | --- | --- | --- |
 | `runs/sweep_smolvlm2-2b.jsonl` | 10,000 | Kaggle T4, 15 Nov 2026, 1.34 s per image, about 3.8 hours | All rows of the sweep, agreed fields, no repeats, one config hash (`f58543b7…`, the same as the pilot), no empty answers |
+| `runs/defence_smolvlm2-2b.jsonl` | 25,800 | Kaggle T4, 15 to 16 Nov 2026, 3 parts of 8,600 rows, 1.27 to 1.36 s per image, about 9.5 hours in all | Each part had exactly its rows of the manifest, with no row in two parts. Joined, the file has every defended row, no repeats, the same config hash and no empty answers |
+
+**SmolVLM is done (B6 and B7).** The sweep and defence files together cover all 35,800 rows of `manifests/full.csv` with one config hash.
 
 The SmolVLM sweep ran with `transformers` 5.23.0, while the pilot used 5.22.2, because the notebook installed the newest version. On the 144 rows that are in both the pilot and the sweep, the same images give the same answers in both, so the version change did not change any answer. The full-run notebooks now install exactly 5.23.0, so every later part uses the same version. 15 SmolVLM answers are longer than five words, all the same habit as in the pilot: the object name, then "Rationale: The main object is …".
 
