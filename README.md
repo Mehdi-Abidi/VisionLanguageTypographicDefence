@@ -117,7 +117,7 @@ The full ticket list with dates, steps and dependencies is in [docs/task-board.m
 
 ## Progress so far
 
-Status on 14 November 2026: phase 0 and phase 1 are done (ALL-1, A1 to A6, B1 to B5, C1 to C6), the pilot gate decisions are written down, and A7 has rendered the full set. Next are the full runs, B6 and B7. This section says what was done, where the data came from, and how 5,000 photos became 200.
+Status on 16 November 2026: phase 0 and phase 1 are done (ALL-1, A1 to A6, B1 to B5, C1 to C6) and the pilot gate decisions are written down. In phase 2, A7 and A8 are done, and the full runs B6 and B7 are done for all three models. B8, the TextVQA utility runs, is under way. This section says what was done, where the data came from, and how 5,000 photos became 200.
 
 ### Where the data comes from
 
@@ -526,13 +526,15 @@ Progress of the full runs:
 | `runs/sweep_llava-next-mistral-7b.jsonl` | 1,600 | Ali, Kaggle T4, 15 Nov 2026, default rendering only | Exactly the default-rendering rows with no defence, agreed fields, no repeats, one config hash (`60ba034d…`, the same as the pilot), no empty answers |
 | `runs/defence_llava-next-mistral-7b.jsonl` | 16,000 | Ali, Kaggle T4, 15 to 16 Nov 2026, 5 parts of 3,200 rows, default rendering only | Each part had exactly its rows of the manifest. Joined, the file has every defended default-rendering row, no repeats, the same config hash and no empty answers |
 | `runs/sweep_qwen3-vl-4b.jsonl` | 10,000 | Mufeed, Kaggle T4, 15 Nov 2026 | All rows of the sweep, agreed fields, no repeats, one config hash (`0930bfbd…`, the same as the pilot), no empty answers |
-| `runs/parts/defence_qwen3-vl-4b_part1of2.jsonl` | 12,900 | Mufeed, Kaggle T4, 15 Nov 2026, part 1 of 2 | Exactly its rows of the manifest, no repeats, the same config hash, no empty answers. Part 2 is still to come |
+| `runs/defence_qwen3-vl-4b.jsonl` | 25,800 | Mufeed, Kaggle T4, 15 to 16 Nov 2026, 2 parts of 12,900 rows | Each part had exactly its rows of the manifest, with no row in two parts. Joined, the file has every defended row, no repeats, the same config hash and no empty answers |
 
 **SmolVLM is done (B6 and B7).** The sweep and defence files together cover all 35,800 rows of `manifests/full.csv` with one config hash.
 
 **LLaVA is done (B6 and B7, default rendering only).** Its sweep and defence files together cover all 17,600 rows of the manifest at `font16_high_object` and clean, with one config hash.
 
-**Qwen is waiting for part 2 of its defence sweep (12,900 rows).**
+**Qwen is done (B6 and B7).** Its sweep and defence files together cover all 35,800 rows of the manifest with one config hash.
+
+**B6 and B7 are done for all three models.** The six files in `runs/` hold 89,200 answers: 35,800 each for SmolVLM and Qwen, and 17,600 for LLaVA at the default rendering. Part 2 of the Qwen defence sweep ran after the runner gained its `--questions` option. Without that option the new runner writes exactly what the old one did, the same hash and the same fields, which was checked on 40 rows of that part before it ran.
 
 Every full run gives the same answers as the pilot on the images both have: 144 of 144 for SmolVLM, 432 of 432 for LLaVA and 432 of 432 for Qwen.
 
