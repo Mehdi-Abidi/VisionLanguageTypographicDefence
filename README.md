@@ -505,8 +505,18 @@ Progress of the full runs:
 | --- | --- | --- | --- |
 | `runs/sweep_smolvlm2-2b.jsonl` | 10,000 | Kaggle T4, 15 Nov 2026, 1.34 s per image, about 3.8 hours | All rows of the sweep, agreed fields, no repeats, one config hash (`f58543b7…`, the same as the pilot), no empty answers |
 | `runs/defence_smolvlm2-2b.jsonl` | 25,800 | Kaggle T4, 15 to 16 Nov 2026, 3 parts of 8,600 rows, 1.27 to 1.36 s per image, about 9.5 hours in all | Each part had exactly its rows of the manifest, with no row in two parts. Joined, the file has every defended row, no repeats, the same config hash and no empty answers |
+| `runs/sweep_llava-next-mistral-7b.jsonl` | 1,600 | Ali, Kaggle T4, 15 Nov 2026, default rendering only | Exactly the default-rendering rows with no defence, agreed fields, no repeats, one config hash (`60ba034d…`, the same as the pilot), no empty answers |
+| `runs/defence_llava-next-mistral-7b.jsonl` | 16,000 | Ali, Kaggle T4, 15 to 16 Nov 2026, 5 parts of 3,200 rows, default rendering only | Each part had exactly its rows of the manifest. Joined, the file has every defended default-rendering row, no repeats, the same config hash and no empty answers |
+| `runs/sweep_qwen3-vl-4b.jsonl` | 10,000 | Mufeed, Kaggle T4, 15 Nov 2026 | All rows of the sweep, agreed fields, no repeats, one config hash (`0930bfbd…`, the same as the pilot), no empty answers |
+| `runs/parts/defence_qwen3-vl-4b_part1of2.jsonl` | 12,900 | Mufeed, Kaggle T4, 15 Nov 2026, part 1 of 2 | Exactly its rows of the manifest, no repeats, the same config hash, no empty answers. Part 2 is still to come |
 
 **SmolVLM is done (B6 and B7).** The sweep and defence files together cover all 35,800 rows of `manifests/full.csv` with one config hash.
+
+**LLaVA is done (B6 and B7, default rendering only).** Its sweep and defence files together cover all 17,600 rows of the manifest at `font16_high_object` and clean, with one config hash.
+
+**Qwen is waiting for part 2 of its defence sweep (12,900 rows).**
+
+Every full run gives the same answers as the pilot on the images both have: 144 of 144 for SmolVLM, 432 of 432 for LLaVA and 432 of 432 for Qwen.
 
 The SmolVLM sweep ran with `transformers` 5.23.0, while the pilot used 5.22.2, because the notebook installed the newest version. On the 144 rows that are in both the pilot and the sweep, the same images give the same answers in both, so the version change did not change any answer. The full-run notebooks now install exactly 5.23.0, so every later part uses the same version. 15 SmolVLM answers are longer than five words, all the same habit as in the pilot: the object name, then "Rationale: The main object is …".
 
