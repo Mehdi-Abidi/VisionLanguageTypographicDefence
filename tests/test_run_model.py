@@ -168,3 +168,47 @@ def test_kill_after_20_rows_and_restart_gives_50_unique_rows(tmp_path):
     assert len(df) == 50
     assert not df.duplicated(["image_id", "cell", "setting", "defence"]).any()
     assert sorted(df["image_id"]) == list(range(50))
+
+
+def test_questions_give_each_row_its_own_prompt(setup):
+    from run_model import QUESTION_PROMPT
+
+    tmp, rows, meta = setup
+    out = tmp / "q.jsonl"
+    questions = {r["image_id"]: f"what is {r['image_id']}?" for r in rows}
+    seen = []
+
+    def ask(images, prompts=None):
+        seen.append(prompts)
+        return [p.split("?")[0] for p in prompts]
+
+    meta = {**meta, "prompt": QUESTION_PROMPT}
+    assert run(rows, ask, out, tmp, meta, batch_size=8, log=lambda *_: None, questions=questions) == 10
+    lines = [json.loads(line) for line in out.read_text(encoding="utf-8").splitlines()]
+    assert lines[3]["prompt"] == "what is 1003?\nAnswer the question using a single word or phrase."
+    assert lines[3]["output"] == "what is 1003"
+    assert [len(p) for p in seen] == [8, 2]
+
+
+def test_questions_survive_the_one_at_a_time_fallback(setup):
+    from run_model import QUESTION_PROMPT
+
+    tmp, rows, meta = setup
+    out = tmp / "q.jsonl"
+    questions = {r["image_id"]: f"q{r['image_id']}" for r in rows}
+
+    def ask(images, prompts=None):
+        if len(images) > 1:
+            raise RuntimeError("CUDA out of memory")
+        return [prompts[0].split("\n")[0]]
+
+    run(rows, ask, out, tmp, {**meta, "prompt": QUESTION_PROMPT}, log=lambda *_: None, questions=questions)
+    df = pd.read_json(out, lines=True, dtype={"output": str})
+    assert df["output"].tolist() == [f"q{1000 + k}" for k in range(10)]
+
+
+def test_question_prompt_changes_the_config_hash():
+    from run_model import QUESTION_PROMPT
+
+    config, spec = load_config(CONFIG, "qwen3-vl-4b")
+    assert config_hash(run_config({**config, "prompt": QUESTION_PROMPT}, spec, 0)) != config_hash(run_config(config, spec, 0))
