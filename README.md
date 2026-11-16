@@ -469,6 +469,21 @@ That first run used Run All in the editor, and Kaggle does not keep the files of
 
 That second run still could not become the dataset. Kaggle keeps only about 500 files of a notebook's output: when the output was turned into a dataset, `images/` showed 499 files and 264 MB instead of 35,800 files and 16 GB. So the A7 notebook now ends by packing the images into 10 zip files, 20 photos each, and deleting the loose files. The output is then 12 files: `images_01.zip` to `images_10.zip`, `full.csv` and `ocr_masks.zip` (3,000 masks, 2.2 MB). The full-run notebooks take the images their part needs out of the zips, or use loose images if a dataset has them. Both ways were tested on a laptop with the zips from a 2-photo A7 run. A third A7 run, with the zips, becomes the `pixelguard-full` dataset. The masks stay on Kaggle and are not in git.
 
+### TextVQA utility set (ticket A8)
+
+`src/make_textvqa_set.py` picks the 200 TextVQA questions that H4 uses to measure what each defence costs in reading.
+
+1. It reads the TextVQA 0.5.1 validation questions (5,000 questions on 3,166 images, 3.1 MB of JSON).
+2. It keeps questions whose majority answer, over the 10 human answers, is one word or a number. That leaves 3,229 questions on 2,420 images. Ties go to the answer that comes first alphabetically.
+3. It sorts them by question id, shuffles them with seed 0, and keeps the first question of each image until it has 200. So the 200 questions are on 200 different images.
+4. Each image is resized to a 512 px short side, the same size as the attack photos, so a defence of a given strength does the same thing to both. It then goes through the same 11 defence settings as A7.
+
+`data/textvqa_set.csv` has one row per question: the question id (used as `image_id`), the TextVQA image id, the question, all 10 human answers as JSON, the majority answer and the original size. `manifests/utility.csv` has 2,200 rows in the agreed manifest format, with cell `textvqa` and setting `none`, so the model runner reads it like any other manifest.
+
+The TextVQA image zip is 7.07 GB. The script does not download it. It reads the zip's file list and the 200 images it needs with HTTP range requests, about the size of the images themselves. A test on 3 questions took 34 seconds and showed that text stays readable at 512 px ("UMD" on a shirt, "Instalando" on a screen, "BAYONETTA" on a game cover). OCR-inpainting removed "Instalando" but not the two styled logos, which is the kind of reading cost H4 measures. `tests/test_make_textvqa_set.py` checks the answer rule, the one-question-per-image rule and the manifest paths.
+
+`notebooks/a8_textvqa_kaggle.ipynb` makes the 2,200 images on Kaggle without a GPU and packs them into `images_utility.zip` (about 800 MB), with `ocr_masks_utility.zip`, `textvqa_set.csv` and `utility.csv` next to it. That output becomes the `pixelguard-utility` dataset. The notebook also checks that it picked the same 200 questions as the committed CSVs.
+
 ### Full runs (tickets B6 and B7)
 
 Each person has their own copy of the notebook, with their model already set:
