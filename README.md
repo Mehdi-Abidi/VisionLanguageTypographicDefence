@@ -553,6 +553,12 @@ The JSONL `prompt` field holds the full question for that row. The template repl
 
 The full-run notebooks take `SWEEP = 'utility'`, with the `pixelguard-utility` dataset added as Input. At B5 speeds that is one part per model: about 0.5 hours for Qwen, 0.9 for SmolVLM and 3.0 for LLaVA. The clean COCO photos under every defence, the other half of B8 step 1, are already in the B7 defence files, because `manifests/full.csv` has the clean photo under all 11 defence settings.
 
+| File | Rows | Run | Checks |
+| --- | --- | --- | --- |
+| `runs/utility_smolvlm2-2b.jsonl` | 2,200 | Mehdi, Kaggle T4, 17 Nov 2026, 1.26 s per image | Exactly the rows of `manifests/utility.csv`, no repeats, no empty answers, every row asked its own question, one config hash (`7a597cbc…`, as computed from the config with the question prompt) |
+
+57 SmolVLM answers go past five words, the same habit as before: the answer, then "Rationale: …". A quick look at its accuracy, with the usual TextVQA rule (an answer scores min(matches / 3, 1) against the 10 human answers) on the first line of each output, gives 77% with no defence, about 74 to 78% under mild blur, JPEG 50 and bit depth, 59 to 64% under median, blur sigma 2 and JPEG 10, and 44 to 45% under OCR-inpainting and blur sigma 3. That is only a first look. The scored numbers for H4 come from lane C.
+
 ### Figure 1 (ticket C6)
 
 ![The 8 versions of photo 183246 with each model's answer](paper/figures/fig1_example.png)
