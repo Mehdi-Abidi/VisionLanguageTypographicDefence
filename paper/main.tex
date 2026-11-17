@@ -7,7 +7,6 @@
 \usepackage[numbers]{natbib}
 
 % Ticket C7. Every number below comes from configs/, manifests/, runs/ or the README.
-% TODO (not in refs.bib yet, needs checking before citing): COCO, TextVQA, EasyOCR, Telea inpainting, Xu et al. 2018 (bit-depth squeezing).
 
 \title{Placeholder title}
 \author{Mufeed Haider \and Mehdi Abidi \and Ali Soban}
@@ -22,13 +21,13 @@
 \subsection{Data}
 
 \paragraph{Attack images.}
-We use 200 photos from the COCO 2017 validation set. Each photo has one dominant object, meaning the largest box covers at least 20\% of the image. We drop four classes: \texttt{person} (no similar-but-wrong label exists in its family), \texttt{dining table} (its box is usually a plate of food), and \texttt{stop sign} and \texttt{book} (they nearly always carry printed text). We take photos in a seeded random order (seed 0), at most 15 per class. Photos that already contain text, as found by EasyOCR at the size the models see, are replaced by a text-free photo of the same class, so that the only text in an image is ours. The set is split into 50 \emph{tune} photos, used only to search for the attacker's settings, and 150 \emph{test} photos, which give every reported number.
+We use 200 photos from the COCO 2017 validation set \citep{lin2014coco}. Each photo has one dominant object, meaning the largest box covers at least 20\% of the image. We drop four classes: \texttt{person} (no similar-but-wrong label exists in its family), \texttt{dining table} (its box is usually a plate of food), and \texttt{stop sign} and \texttt{book} (they nearly always carry printed text). We take photos in a seeded random order (seed 0), at most 15 per class. Photos that already contain text, as found by EasyOCR \citep{jaidedai2024easyocr} at the size the models see, are replaced by a text-free photo of the same class, so that the only text in an image is ours. The set is split into 50 \emph{tune} photos, used only to search for the attacker's settings, and 150 \emph{test} photos, which give every reported number.
 
 \paragraph{Targets.}
 Each photo gets one on-topic target, a wrong class from the same COCO family (a zebra gets ``elephant''). For families whose members are not plausible look-alikes, such as furniture and kitchen items, we use a short hand-written list of look-alikes. Each photo also gets one off-topic canary, the word ``TUESDAY'', which cannot answer an object question. Targets are drawn with a per-photo seed, so the set is reproducible.
 
 \paragraph{Reading utility.}
-To measure what a defence costs on a task that needs reading, we use 200 TextVQA validation questions on 200 different images. The questions are chosen from those whose majority answer over the ten human answers is one word or a number and is not ``unanswerable'', in a seeded order (seed 0). Each image is resized to a 512\,px short side, the same as the attack photos.
+To measure what a defence costs on a task that needs reading, we use 200 TextVQA \citep{singh2019textvqa} validation questions on 200 different images. The questions are chosen from those whose majority answer over the ten human answers is one word or a number and is not ``unanswerable'', in a seeded order (seed 0). Each image is resized to a 512\,px short side, the same as the attack photos.
 
 \subsection{Attack design}
 
@@ -59,7 +58,7 @@ Images are resized to a 512\,px short side. Text is set in DejaVu Sans Bold, bla
 
 \subsection{Defences}
 
-We test six families of cheap preprocessing, which give 11 settings with the undefended image (Table~\ref{tab:defences}). They run on the rendered image, before the model sees it. The strength ladders are Gaussian blur ($\sigma\in\{1,2,3\}$) and JPEG quality ($\{50,20,10\}$). The bit-depth defence maps 0 to 255 onto eight evenly spaced levels per channel. The OCR defence reads the image with EasyOCR (English), keeps boxes with confidence at least 0.3, grows each by 3\,px, and fills them with Telea inpainting (radius 3).
+We test six families of cheap preprocessing, which give 11 settings with the undefended image (Table~\ref{tab:defences}). They run on the rendered image, before the model sees it. The strength ladders are Gaussian blur ($\sigma\in\{1,2,3\}$) and JPEG quality ($\{50,20,10\}$). The bit-depth defence maps 0 to 255 onto eight evenly spaced levels per channel \citep{xu2018featuresqueezing}. The OCR defence reads the image with EasyOCR \citep{jaidedai2024easyocr} (English), keeps boxes with confidence at least 0.3, grows each by 3\,px, and fills them with Telea inpainting \citep{telea2004inpainting} (radius 3).
 
 \begin{table}[h]
 \centering
