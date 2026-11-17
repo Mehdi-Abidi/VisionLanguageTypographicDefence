@@ -46,8 +46,8 @@ FONT_PATH = None
 
 
 @lru_cache(maxsize=None)
-def load_font(size: int) -> ImageFont.FreeTypeFont:
-    return ImageFont.truetype(str(FONT_PATH or find_font()), size)
+def load_font(size: int, path: str = None) -> ImageFont.FreeTypeFont:
+    return ImageFont.truetype(str(path or FONT_PATH or find_font()), size)
 
 
 def load_photo(file_name: str, cache_dir: Path) -> Image.Image:
@@ -89,14 +89,16 @@ def break_like(text: str, reference_lines: list) -> list:
 
 
 def render(image: Image.Image, text: str, font_size: int = 16, contrast: str = "high",
-           placement: str = "object", object_box: tuple = None, size_like: str = None) -> Image.Image:
+           placement: str = "object", object_box: tuple = None, size_like: str = None,
+           font_path: str = None, repeat: int = 1) -> Image.Image:
     out = image.copy()
     if not text:
         return out
-    font = load_font(font_size)
+    font = load_font(font_size, font_path)
     max_width = out.width - 2 * (MARGIN + PADDING)
     ref_lines = wrap(size_like or text, font, max_width)
     lines = break_like(text, ref_lines) if size_like else ref_lines
+    ref_lines, lines = ref_lines * repeat, lines * repeat
 
     ascent, descent = font.getmetrics()
     line_height = ascent + descent
