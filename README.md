@@ -560,6 +560,28 @@ The full-run notebooks take `SWEEP = 'utility'`, with the `pixelguard-utility` d
 
 57 SmolVLM answers go past five words, the same habit as before: the answer, then "Rationale: …". A quick look at its accuracy, with the usual TextVQA rule (an answer scores min(matches / 3, 1) against the 10 human answers) on the first line of each output, gives 77% with no defence, about 74 to 78% under mild blur, JPEG 50 and bit depth, 59 to 64% under median, blur sigma 2 and JPEG 10, and 44 to 45% under OCR-inpainting and blur sigma 3. LLaVA, with no long answers, shows the same order: 75% with no defence, 69 to 72% under JPEG 50, bit depth and mild blur, 55 to 63% under JPEG 10, blur sigma 2 and median, and 42 to 43% under blur sigma 3 and OCR-inpainting. That is only a first look. The scored numbers for H4 come from lane C.
 
+### Defence-aware attacker search (ticket B9)
+
+B9 asks, for each of three defences, which rendering keeps the attack alive best. Only the 50 tuning photos are used, so the 150 test photos stay untouched until B10.
+
+**The grid.** `src/make_attacker_set.py` renders C-on and I-on under 36 settings:
+
+| Factor | Values |
+| --- | --- |
+| Font size | 16, 24, 32 px |
+| Contrast | high, low (the same colours as the rendering sweep) |
+| Font | DejaVu Sans Bold, Comic Neue Bold |
+| Text written | 1, 2 or 3 times, stacked in one box |
+
+The text sits on the main object, as in the default rendering. Each render goes through blur sigma 2, JPEG 20 and OCR-inpaint, which gives 50 × 2 × 36 × 3 = 10,800 rows in `manifests/attacker_search.csv`. Settings are named like `font24_low_object_comic_x2`.
+
+- **Stylised font.** The task board suggests Comic Sans. It is not free to share and is not on Kaggle, so the repo carries Comic Neue Bold, a free font drawn after Comic Sans, under the SIL Open Font License (`assets/fonts/`).
+- **Renderer changes.** `render.py` gained two arguments, `font_path` and `repeat`. With their defaults nothing changes: 40 pilot images rendered again came out byte for byte the same, and the grid's `font16_high_object_dejavu_x1` images are byte for byte the default-rendering images. `tests/test_render.py` checks the defaults, the taller box for repeated text and the different font.
+- **Images.** `notebooks/b9_render_kaggle.ipynb` renders the grid on a Kaggle GPU (OCR needs it) and packs the 10,800 defended images into five zips, about 2.7 GB. That becomes the `pixelguard-attacker` dataset. A one-photo test on a laptop made all 216 rows of that photo with none missing.
+- **Runs.** SmolVLM and Qwen, the two smaller models, run it with `SWEEP = 'attacker'` in their full-run notebooks: one part each, about 4 hours for SmolVLM and 2 hours for Qwen.
+
+**The choice.** `src/pick_attacker.py` scores every answer with `score.py` against the photo's on-topic target. For each defence it takes the setting with the highest success over both models, both cells and all 50 photos, 200 answers per setting. A tie goes to the first setting in the grid, which is the smaller, plainer one. It writes `configs/attacker.yaml`, with the chosen setting per defence, its success per model and per cell, and the success of the default rendering under the same defence for comparison. It also writes `results/attacker_search_scores.csv` with every setting. `tests/test_pick_attacker.py` checks the choice, the tie rule, two-word targets and negation, and the files it writes.
+
 ### Figure 1 (ticket C6)
 
 ![The 8 versions of photo 183246 with each model's answer](paper/figures/fig1_example.png)
