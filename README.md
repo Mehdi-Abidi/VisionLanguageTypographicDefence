@@ -556,8 +556,9 @@ The full-run notebooks take `SWEEP = 'utility'`, with the `pixelguard-utility` d
 | File | Rows | Run | Checks |
 | --- | --- | --- | --- |
 | `runs/utility_smolvlm2-2b.jsonl` | 2,200 | Mehdi, Kaggle T4, 17 Nov 2026, 1.26 s per image | Exactly the rows of `manifests/utility.csv`, no repeats, no empty answers, every row asked its own question, one config hash (`7a597cbc…`, as computed from the config with the question prompt) |
+| `runs/utility_llava-next-mistral-7b.jsonl` | 2,200 | Ali, Kaggle T4, 16 Nov 2026, about 2.8 hours | Exactly the rows of `manifests/utility.csv`, no repeats, no empty answers, every row asked its own question, one config hash (`446b8e93…`, as computed) |
 
-57 SmolVLM answers go past five words, the same habit as before: the answer, then "Rationale: …". A quick look at its accuracy, with the usual TextVQA rule (an answer scores min(matches / 3, 1) against the 10 human answers) on the first line of each output, gives 77% with no defence, about 74 to 78% under mild blur, JPEG 50 and bit depth, 59 to 64% under median, blur sigma 2 and JPEG 10, and 44 to 45% under OCR-inpainting and blur sigma 3. That is only a first look. The scored numbers for H4 come from lane C.
+57 SmolVLM answers go past five words, the same habit as before: the answer, then "Rationale: …". A quick look at its accuracy, with the usual TextVQA rule (an answer scores min(matches / 3, 1) against the 10 human answers) on the first line of each output, gives 77% with no defence, about 74 to 78% under mild blur, JPEG 50 and bit depth, 59 to 64% under median, blur sigma 2 and JPEG 10, and 44 to 45% under OCR-inpainting and blur sigma 3. LLaVA, with no long answers, shows the same order: 75% with no defence, 69 to 72% under JPEG 50, bit depth and mild blur, 55 to 63% under JPEG 10, blur sigma 2 and median, and 42 to 43% under blur sigma 3 and OCR-inpainting. That is only a first look. The scored numbers for H4 come from lane C.
 
 ### Figure 1 (ticket C6)
 
