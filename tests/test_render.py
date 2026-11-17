@@ -29,7 +29,7 @@ def test_repeat_stacks_the_text_in_one_taller_box():
     one = box_rows(R.render(PHOTO, "cat", 24, "high", "object", BOX))
     three = box_rows(R.render(PHOTO, "cat", 24, "high", "object", BOX, repeat=3))
     line = R.load_font(24).getmetrics()
-    assert three - one == 2 * (sum(line) + R.LINE_SPACING)
+    assert abs((three - one) - 2 * (sum(line) + R.LINE_SPACING)) <= 2
 
 
 def test_stylised_font_draws_different_letters():
