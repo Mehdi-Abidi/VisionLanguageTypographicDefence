@@ -117,7 +117,7 @@ The full ticket list with dates, steps and dependencies is in [docs/task-board.m
 
 ## Progress so far
 
-Status on 16 November 2026: phase 0 and phase 1 are done (ALL-1, A1 to A6, B1 to B5, C1 to C6) and the pilot gate decisions are written down. In phase 2, A7 and A8 are done, and the full runs B6 and B7 are done for all three models. B8, the TextVQA utility runs, is under way. This section says what was done, where the data came from, and how 5,000 photos became 200.
+Status on 17 November 2026: phase 0 and phase 1 are done (ALL-1, A1 to A6, B1 to B5, C1 to C6) and the pilot gate decisions are written down. In phase 2, A7 and A8 are done, and the full runs B6, B7 and B8 are done for all three models. For B9, the attacker search, the code and manifest are ready and the Kaggle runs are next. This section says what was done, where the data came from, and how 5,000 photos became 200.
 
 ### Where the data comes from
 
@@ -557,8 +557,9 @@ The full-run notebooks take `SWEEP = 'utility'`, with the `pixelguard-utility` d
 | --- | --- | --- | --- |
 | `runs/utility_smolvlm2-2b.jsonl` | 2,200 | Mehdi, Kaggle T4, 17 Nov 2026, 1.26 s per image | Exactly the rows of `manifests/utility.csv`, no repeats, no empty answers, every row asked its own question, one config hash (`7a597cbc…`, as computed from the config with the question prompt) |
 | `runs/utility_llava-next-mistral-7b.jsonl` | 2,200 | Ali, Kaggle T4, 16 Nov 2026, about 2.8 hours | Exactly the rows of `manifests/utility.csv`, no repeats, no empty answers, every row asked its own question, one config hash (`446b8e93…`, as computed) |
+| `runs/utility_qwen3-vl-4b.jsonl` | 2,200 | Mufeed, Kaggle T4, 17 Nov 2026, about 15 minutes | Exactly the rows of `manifests/utility.csv`, no repeats, no empty answers, every row asked its own question with the same prompts as the SmolVLM file, one config hash (`25ac4ddb…`, as computed) |
 
-57 SmolVLM answers go past five words, the same habit as before: the answer, then "Rationale: …". A quick look at its accuracy, with the usual TextVQA rule (an answer scores min(matches / 3, 1) against the 10 human answers) on the first line of each output, gives 77% with no defence, about 74 to 78% under mild blur, JPEG 50 and bit depth, 59 to 64% under median, blur sigma 2 and JPEG 10, and 44 to 45% under OCR-inpainting and blur sigma 3. LLaVA, with no long answers, shows the same order: 75% with no defence, 69 to 72% under JPEG 50, bit depth and mild blur, 55 to 63% under JPEG 10, blur sigma 2 and median, and 42 to 43% under blur sigma 3 and OCR-inpainting. That is only a first look. The scored numbers for H4 come from lane C.
+57 SmolVLM answers go past five words, the same habit as before: the answer, then "Rationale: …". A quick look at its accuracy, with the usual TextVQA rule (an answer scores min(matches / 3, 1) against the 10 human answers) on the first line of each output, gives 77% with no defence, about 74 to 78% under mild blur, JPEG 50 and bit depth, 59 to 64% under median, blur sigma 2 and JPEG 10, and 44 to 45% under OCR-inpainting and blur sigma 3. LLaVA, with no long answers, shows the same order: 75% with no defence, 69 to 72% under JPEG 50, bit depth and mild blur, 55 to 63% under JPEG 10, blur sigma 2 and median, and 42 to 43% under blur sigma 3 and OCR-inpainting. Qwen reads text best of the three and keeps the same order: 82% with no defence, 80 to 81% under JPEG 50, bit depth and mild blur, 60 to 76% under JPEG 20, resizing, JPEG 10, blur sigma 2 and median, 55% under blur sigma 3 and 49% under OCR-inpainting. That is only a first look. The scored numbers for H4 come from lane C.
 
 ### Defence-aware attacker search (ticket B9)
 
