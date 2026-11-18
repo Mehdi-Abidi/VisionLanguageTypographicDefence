@@ -55,15 +55,16 @@ def manifest_rows(photos: list) -> list:
             for p in photos for cell in CELLS for g in grid() for d in DEFENCES]
 
 
-def make_images(photos: list, rows: list, out: Path, cache: Path) -> None:
+def make_images(photos: list, rows: list, out: Path, cache: Path, settings: list = None) -> None:
     import render as R
 
+    settings = grid() if settings is None else settings
     (out / "images").mkdir(parents=True, exist_ok=True)
     for k, p in enumerate(photos, 1):
         photo = R.load_photo(p["file_name"], cache)
         box = tuple(float(p[c]) for c in ("box_x", "box_y", "box_w", "box_h"))
         photo, box = R.resize_short_side(photo, box)
-        for g in grid():
+        for g in settings:
             texts = R.cell_texts(p, g["size"], 0)
             for cell in CELLS:
                 path = out / mm.render_path(p["image_id"], cell, g["setting"])
