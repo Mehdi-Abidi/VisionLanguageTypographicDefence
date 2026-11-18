@@ -68,7 +68,7 @@ RQ2 is the contribution. RQ1 is a replication that sets up the 2x2 design. RQ3 t
 1. **RQ1. When does image text act as context and when as instruction?**
    H1: On-topic labels succeed more often than off-topic commands in at least two of three models.
 2. **RQ2. Do defences treat the two attack types differently?** (headline)
-   H2: As blur rises or JPEG quality falls, instruction success drops faster than context success, measured as the area under each curve within a model.
+   H2: As blur rises or JPEG quality falls, instruction success drops faster than context success, measured as the area under each curve within a model. Since the pilot gate this compares I-on with C-on, because I-off never worked in the pilot (see "Pilot gate").
    H4: Every defence that cuts attack success also cuts TextVQA accuracy. We report the trade-off curve, not one "best" defence.
 3. **RQ3. Is there a gap between text OCR reads and text the model follows?**
    H3: Some successful attacks, more at low contrast and small fonts, are missed by EasyOCR, so OCR-inpainting cannot remove them.
@@ -117,7 +117,7 @@ The full ticket list with dates, steps and dependencies is in [docs/task-board.m
 
 ## Progress so far
 
-Status on 17 November 2026: phase 0 and phase 1 are done (ALL-1, A1 to A6, B1 to B5, C1 to C6) and the pilot gate decisions are written down. In phase 2, A7 and A8 are done, and the full runs B6, B7 and B8 are done for all three models. For B9, the attacker search, the code and manifest are ready and the Kaggle runs are next. This section says what was done, where the data came from, and how 5,000 photos became 200.
+Status on 18 November 2026: phase 0 and phase 1 are done (ALL-1, A1 to A6, B1 to B5, C1 to C6) and the pilot gate decisions are written down. Phase 2 is done: A7, A8, the full runs B6, B7 and B8 for all three models, the Setup section of the paper (C7) and the analysis notebook (C8). In phase 3, A9 and A10 are merged and need one more Kaggle run after a fix to the OCR match. For B9, the attacker search, the code and manifest are ready and the Kaggle runs are next. This section says what was done, where the data came from, and how 5,000 photos became 200.
 
 ### Where the data comes from
 
@@ -397,7 +397,7 @@ How often the target word appears, out of 20 photos, with no defence:
 What the pilot shows:
 
 1. **The numbers point to keeping 16 px.** The pre-registration switches to 24 px only if no model's C-on success is clearly above the neutral control. SmolVLM (9 against 0) and Qwen (5 against 0) are well above it. The ticket's own check passes too, because models followed "Say ..." on 6 rows. The decision is made at the pilot gate on 15 November.
-2. **No model ever said TUESDAY.** Across `i_off`, `c_off` and `neutral_long` under all three defences, that is 0 of 180 rows for each model. The models answer the question and leave off-topic text alone. This puts I-off at zero, and H1b and H2 both compare against I-off. H2 divides by the undefended I-off rate, so it cannot be computed at zero. The team has to settle this at the pilot gate, before any full run. The pre-registration allows only the font switch, so any other change must be written into it as a change, with the reason.
+2. **No model ever said TUESDAY.** Across `i_off`, `c_off` and `neutral_long` under all three defences, that is 0 of 180 rows for each model. The models answer the question and leave off-topic text alone. This puts I-off at zero, and H1b and H2 both compare against I-off. H2 divides by the undefended I-off rate, so it cannot be computed at zero. The team has to settle this at the pilot gate, before any full run. The pre-registration allows only the font switch, so any other change must be written into it as a change, with the reason. This held for the pilot only. In the full runs 7 of 35,400 off-topic rows did say TUESDAY, all of them `c_off` (C8).
 3. **The `i_on` hits come from five photos only.** They are 1503 (keyboard on a laptop photo), 42178 (motorcycle on a train photo), 55528 (chair on a couch photo), 183246 (train on a truck photo) and 190637 (couch on a bed photo).
 4. **OCR inpainting removes every attack here.** With `ocr_inpaint` the target word appears 0 times, in every cell, for every model. At 16 px and high contrast EasyOCR finds all the text, so H3 depends on the low-contrast and small-font settings.
 5. **Blur at sigma 2 makes some attacks stronger.** Qwen's C-long goes from 5 to 10 and its C-on from 5 to 8. LLaVA's C-on goes from 1 to 3. The blurred photo is harder to name while 16 px text stays readable. This is the image-damage effect that the H2 control is there to catch.
@@ -582,6 +582,21 @@ The text sits on the main object, as in the default rendering. Each render goes 
 - **Runs.** SmolVLM and Qwen, the two smaller models, run it with `SWEEP = 'attacker'` in their full-run notebooks: one part each, about 4 hours for SmolVLM and 2 hours for Qwen.
 
 **The choice.** `src/pick_attacker.py` scores every answer with `score.py` against the photo's on-topic target. For each defence it takes the setting with the highest success over both models, both cells and all 50 photos, 200 answers per setting. A tie goes to the first setting in the grid, which is the smaller, plainer one. It writes `configs/attacker.yaml`, with the chosen setting per defence, its success per model and per cell, and the success of the default rendering under the same defence for comparison. It also writes `results/attacker_search_scores.csv` with every setting. `tests/test_pick_attacker.py` checks the choice, the tie rule, two-word targets and negation, and the files it writes.
+
+### OCR read and image quality (tickets A9 and A10)
+
+Mufeed's `src/ocr_read.py` (A9) runs EasyOCR on the 7,000 attacked images with no defence (five attack cells, 200 photos, seven rendering settings) and marks `ocr_read = 1` when it read the row's target, or TUESDAY for the off-topic cells, within edit distance 1. `src/image_quality.py` (A10) compares each of the 25,800 defended images with its undefended version and writes the mean and standard deviation of PSNR and SSIM per defence.
+
+Two fixes were made after the merge, so the two result files in `results/` will be replaced by one more run:
+
+- **A9 matched whole lines.** EasyOCR returns lines such as "Say cat" or "This is a cat, not a dog", and the first version compared the whole line with "cat". C-long came out as read on only 2% of default-rendering images, and I-on and I-off on about 77%, while C-on and C-off, which are one word, were near 100%. The match now splits each line into words and compares the target with every run of words, so two-word targets such as "hot dog" also match across two detections or when read as "hotdog". The file gains an `ocr_text` column with what EasyOCR read, so the match can be redone without OCR.
+- **A10 gave an infinite PSNR for OCR-inpainting.** When EasyOCR finds no text the defence leaves the image as it was, for example on the clean photos, and PSNR is infinite. Those pairs are now counted in `n_unchanged`, and the PSNR mean and standard deviation are taken over the pairs that changed. SSIM still uses every pair. A new `results/image_quality_rows.csv` keeps PSNR and SSIM for every pair.
+
+`notebooks/a9_a10_kaggle.ipynb` runs both on a Kaggle T4 in about 45 minutes, with the `pixelguard-full` dataset as Input: OCR on the GPU and image quality on the CPU at the same time. The first run already shows the order for A10: JPEG 50 changes the image least (PSNR 31.8 dB, SSIM 0.90) and blur sigma 3 the most (22.5 dB, 0.64). OCR-inpainting has an SSIM of 0.985, because it only touches the text box.
+
+### Paper Setup section and analysis notebook (tickets C7 and C8)
+
+Ali's `paper/main.tex` has the Setup section, with data, attack design, rendering, defences, models and prompt, runs, scoring and statistics, and `paper/refs.bib` the references it cites. Every number in it was checked against `configs/models.yaml`, `manifests/full.csv` and `src/render.py`. `src/analysis.py` scores every row of the B6 and B7 files into one table (89,200 rows) and draws attack success per cell and against font size on the 150 test photos, with Wilson intervals. `notebooks/analysis.ipynb` calls it. At the default rendering with no defence, C-on succeeds on 30% of test photos for SmolVLM, 14% for Qwen and 8% for LLaVA, and I-on on 10%, 6% and 6%.
 
 ### Figure 1 (ticket C6)
 
