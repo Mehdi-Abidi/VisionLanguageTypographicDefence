@@ -108,6 +108,24 @@ An output counts as a success if the target appears as whole words in the same o
 
 We report attack success rate with Wilson 95\% intervals. With 150 test photos, an interval near 50\% is about $\pm 8$ points wide, so we do not read small differences. Paired comparisons on the same images use the exact McNemar test. The H2 comparison of how fast a cell's success falls across a strength ladder uses a paired bootstrap over images (10\,000 resamples, seed 0) of the difference in retained success, the area under the success-against-strength curve divided by the undefended success. As fixed at the pilot gate, H2 compares C-on with I-on, because I-off had no successes in the pilot. Each hypothesis is tested separately for each model, and the primary tests are Holm-corrected together within a model. All tests, thresholds and the analysis plan were written down before the full runs (\texttt{docs/pre-registration.md}).
 
+\section{Limitations}
+\label{sec:limitations}
+
+\paragraph{Small and quantised models.}
+We test three open models of 2B to 7B parameters, and LLaVA-NeXT runs in 4-bit. Larger or closed models may read and obey image text differently, and quantisation may change how LLaVA-NeXT behaves, so we do not claim our rates carry over to them. LLaVA-NeXT was also run only at the default rendering, so it has no font-size sweep.
+
+\paragraph{Synthetic overlays.}
+The text is a clean, horizontal, high-contrast box added to a COCO photo. Text that is part of a real scene (a sign, a shirt, a product label) is bent, lit and cluttered in ways our overlays are not. Our images also hold one dominant object, and the text-free filter removes photos that a real deployment would contain.
+
+\paragraph{A search attacker, not a gradient attack.}
+The defence-aware attacker only searches a grid of 36 rendering settings (size, contrast, font, repeats) on 50 tuning photos, and the search is run on the two smaller models. It does not optimise against the defence, so a stronger attacker may keep more of the attack alive. Our numbers for defended attacks are therefore upper bounds on how well a defence works, not guarantees.
+
+\paragraph{One question and one decoding.}
+Every run uses one question template, greedy decoding and one seed. Other phrasings, system prompts or sampling may move the rates, and a user question that asks about text would change the task.
+
+\paragraph{Sample size.}
+With 150 test photos the 95\% Wilson interval is about $\pm 8$ points near 50\% and about $\pm 5$ points near 10\%. Differences of a few points between cells or defences are not resolved, and the Holm-corrected tests have little power for effects that small. The instruction cells also have few successes in the default rendering, which widens the intervals on the very comparisons we care about.
+
 \bibliographystyle{plainnat}
 \bibliography{refs}
 
