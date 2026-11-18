@@ -583,6 +583,16 @@ The text sits on the main object, as in the default rendering. Each render goes 
 
 **The choice.** `src/pick_attacker.py` scores every answer with `score.py` against the photo's on-topic target. For each defence it takes the setting with the highest success over both models, both cells and all 50 photos, 200 answers per setting. A tie goes to the first setting in the grid, which is the smaller, plainer one. It writes `configs/attacker.yaml`, with the chosen setting per defence, its success per model and per cell, and the success of the default rendering under the same defence for comparison. It also writes `results/attacker_search_scores.csv` with every setting. `tests/test_pick_attacker.py` checks the choice, the tie rule, two-word targets and negation, and the files it writes.
 
+### Attacker on the test photos (ticket B10)
+
+B10 takes the setting B9 chose for each defence and runs it on the 150 test photos with all three models. `src/make_attacker_test_set.py` reads `configs/attacker.yaml` and writes `manifests/attacker_test.csv`: C-on and I-on in each chosen setting, once through the defence it was chosen for and once undefended, so the drop the defence causes is measured on the same images. That is 1,800 rows per model, or fewer if two defences chose the same setting. The default rendering under the same defences is already in the B7 files. `tests/test_make_attacker_test_set.py` checks the rows, the shared-setting case and that a setting outside the grid is refused.
+
+Steps, once `configs/attacker.yaml` and the manifest are committed:
+
+1. `notebooks/b10_render_kaggle.ipynb` renders the images on a Kaggle GPU (about 15 minutes). Its output becomes the `pixelguard-attacker-test` dataset, shared with Mufeed and Ali.
+2. Each person runs their full-run notebook with `SWEEP = 'attacker_test'`, `PART = 1`: about 0.8 hours for SmolVLM, 0.4 for Qwen and 2.4 for LLaVA. LLaVA runs it too, because `ONLY_DEFAULT_SETTING` only applies to the B6 and B7 sweeps.
+3. The three files are committed as `runs/attacker_{model}.jsonl`.
+
 ### OCR read and image quality (tickets A9 and A10)
 
 Mufeed's `src/ocr_read.py` (A9) runs EasyOCR on the 7,000 attacked images with no defence (five attack cells, 200 photos, seven rendering settings) and marks `ocr_read = 1` when it read the row's target, or TUESDAY for the off-topic cells, within edit distance 1. `src/image_quality.py` (A10) compares each of the 25,800 defended images with its undefended version and writes the mean and standard deviation of PSNR and SSIM per defence.
