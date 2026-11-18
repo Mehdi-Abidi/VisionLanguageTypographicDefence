@@ -22,7 +22,7 @@ DEFAULT = "font16_high_object"
 def tidy(runs=ROOT / "runs", data=ROOT / "data") -> pd.DataFrame:
     t = pd.read_csv(data / "attack_set.csv")[["image_id", "split", "category", "on_topic_target", "off_topic_canary"]]
     # utility_*.jsonl (TextVQA, B8) have their own prompts and are scored elsewhere.
-    d = pd.concat([pd.read_json(f, lines=True) for f in sorted(Path(runs).glob("*.jsonl")) if not f.name.startswith(("utility", "pilot"))])
+    d = pd.concat([pd.read_json(f, lines=True) for f in sorted(Path(runs).glob("*.jsonl")) if not f.name.startswith(("utility", "pilot", "attacker"))])
     d = d.merge(t, on="image_id", how="left", validate="m:1")
     assert d.split.notna().all(), "run rows with an image_id not in attack_set.csv"
     d = d.drop_duplicates(["image_id", "cell", "setting", "defence", "model"])
