@@ -1,6 +1,10 @@
 """A10. For each defence, PSNR and SSIM between the defended image and the
 undefended (defence=none) version of the same image_id, cell and setting.
 
+A defence can leave an image exactly as it was, for example OCR-inpainting when EasyOCR finds no
+text. PSNR is then infinite, so those pairs are counted in n_unchanged and the PSNR mean and
+standard deviation are taken over the pairs that changed. SSIM uses every pair.
+
 Usage:
     python src/image_quality.py --manifest manifests/full.csv \
         --images-root /tmp/pg_root --out results/image_quality.csv
@@ -43,10 +47,12 @@ def compute_metrics(clean: np.ndarray, other: np.ndarray) -> dict:
 def summarize(per_row: list) -> pd.DataFrame:
     """Group a list of {"defence", "psnr", "ssim"} dicts into the mean/std
     per defence table that gets written to results/image_quality.csv."""
-    per_row_df = pd.DataFrame(per_row, columns=["defence", "psnr", "ssim"])
-    return per_row_df.groupby("defence").agg(
-        n=("psnr", "size"),
-        psnr_mean=("psnr", "mean"), psnr_std=("psnr", "std"),
+    df = pd.DataFrame(per_row, columns=["defence", "psnr", "ssim"])
+    df["unchanged"] = np.isinf(df["psnr"].astype(float))
+    df["psnr_changed"] = df["psnr"].where(~df["unchanged"])
+    return df.groupby("defence").agg(
+        n=("psnr", "size"), n_unchanged=("unchanged", "sum"),
+        psnr_mean=("psnr_changed", "mean"), psnr_std=("psnr_changed", "std"),
         ssim_mean=("ssim", "mean"), ssim_std=("ssim", "std"),
     ).reset_index()
 
@@ -56,6 +62,7 @@ def main() -> None:
     parser.add_argument("--manifest", type=Path, default=Path("manifests/full.csv"))
     parser.add_argument("--images-root", type=Path, default=Path("."))
     parser.add_argument("--out", type=Path, default=Path("results/image_quality.csv"))
+    parser.add_argument("--rows", type=Path, default=Path("results/image_quality_rows.csv"))
     parser.add_argument("--limit", type=int, default=0, help="stop after N defended rows, 0 for all")
     args = parser.parse_args()
 
@@ -78,7 +85,8 @@ def main() -> None:
         if metrics is None:
             missing_pair += 1
             continue
-        per_row.append({"defence": row["defence"], **metrics})
+        per_row.append({"image_id": row["image_id"], "cell": row["cell"], "setting": row["setting"],
+                        "defence": row["defence"], **metrics})
         if (k + 1) % 500 == 0 or k + 1 == len(defended):
             print(f"{k + 1}/{len(defended)}")
 
@@ -88,7 +96,8 @@ def main() -> None:
     summary = summarize(per_row)
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    summary.to_csv(args.out, index=False)
+    summary.to_csv(args.out, index=False, lineterminator="\n")
+    pd.DataFrame(per_row).round(4).to_csv(args.rows, index=False, lineterminator="\n")
     print(f"wrote {len(summary)} defences to {args.out}")
     print(summary.to_string(index=False))
 

@@ -81,4 +81,18 @@ def test_summarize_single_sample_std_is_nan():
 def test_summarize_empty_input_has_no_rows():
     summary = summarize([])
     assert len(summary) == 0
-    assert list(summary.columns) == ["defence", "n", "psnr_mean", "psnr_std", "ssim_mean", "ssim_std"]
+    assert list(summary.columns) == ["defence", "n", "n_unchanged", "psnr_mean", "psnr_std", "ssim_mean", "ssim_std"]
+
+
+def test_summarize_keeps_unchanged_pairs_out_of_the_psnr_mean():
+    per_row = [
+        {"defence": "ocr_inpaint", "psnr": np.inf, "ssim": 1.0},
+        {"defence": "ocr_inpaint", "psnr": 30.0, "ssim": 0.9},
+        {"defence": "ocr_inpaint", "psnr": 34.0, "ssim": 0.95},
+    ]
+    summary = summarize(per_row).set_index("defence")
+    assert summary.loc["ocr_inpaint", "n"] == 3
+    assert summary.loc["ocr_inpaint", "n_unchanged"] == 1
+    assert summary.loc["ocr_inpaint", "psnr_mean"] == pytest.approx(32.0)
+    assert np.isfinite(summary.loc["ocr_inpaint", "psnr_std"])
+    assert summary.loc["ocr_inpaint", "ssim_mean"] == pytest.approx(0.95)
