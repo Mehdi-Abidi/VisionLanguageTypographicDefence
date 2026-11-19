@@ -117,7 +117,7 @@ The full ticket list with dates, steps and dependencies is in [docs/task-board.m
 
 ## Progress so far
 
-Status on 18 November 2026: phase 0 and phase 1 are done (ALL-1, A1 to A6, B1 to B5, C1 to C6) and the pilot gate decisions are written down. Phase 2 is done: A7, A8, the full runs B6, B7 and B8 for all three models, the Setup section of the paper (C7) and the analysis notebook (C8). In phase 3, A9 and A10 are merged and need one more Kaggle run after a fix to the OCR match. For B9, the attacker search, the code and manifest are ready and the Kaggle runs are next. This section says what was done, where the data came from, and how 5,000 photos became 200.
+Status on 19 November 2026: phase 0 and phase 1 are done (ALL-1, A1 to A6, B1 to B5, C1 to C6) and the pilot gate decisions are written down. Phase 2 is done: A7, A8, the full runs B6, B7 and B8 for all three models, the Setup section of the paper (C7) and the analysis notebook (C8). In phase 3, A9 and A10 are done. For B9, the attacker search, the images are rendered and the two model runs are under way. The B10 code is ready and waits for the B9 choice. This section says what was done, where the data came from, and how 5,000 photos became 200.
 
 ### Where the data comes from
 
@@ -597,12 +597,31 @@ Steps, once `configs/attacker.yaml` and the manifest are committed:
 
 Mufeed's `src/ocr_read.py` (A9) runs EasyOCR on the 7,000 attacked images with no defence (five attack cells, 200 photos, seven rendering settings) and marks `ocr_read = 1` when it read the row's target, or TUESDAY for the off-topic cells, within edit distance 1. `src/image_quality.py` (A10) compares each of the 25,800 defended images with its undefended version and writes the mean and standard deviation of PSNR and SSIM per defence.
 
-Two fixes were made after the merge, so the two result files in `results/` will be replaced by one more run:
+Two fixes were made after the merge, and Mufeed ran both again on 19 November:
 
 - **A9 matched whole lines.** EasyOCR returns lines such as "Say cat" or "This is a cat, not a dog", and the first version compared the whole line with "cat". C-long came out as read on only 2% of default-rendering images, and I-on and I-off on about 77%, while C-on and C-off, which are one word, were near 100%. The match now splits each line into words and compares the target with every run of words, so two-word targets such as "hot dog" also match across two detections or when read as "hotdog". The file gains an `ocr_text` column with what EasyOCR read, so the match can be redone without OCR.
 - **A10 gave an infinite PSNR for OCR-inpainting.** When EasyOCR finds no text the defence leaves the image as it was, for example on the clean photos, and PSNR is infinite. Those pairs are now counted in `n_unchanged`, and the PSNR mean and standard deviation are taken over the pairs that changed. SSIM still uses every pair. A new `results/image_quality_rows.csv` keeps PSNR and SSIM for every pair.
 
-`notebooks/a9_a10_kaggle.ipynb` runs both on a Kaggle T4 in about 45 minutes, with the `pixelguard-full` dataset as Input: OCR on the GPU and image quality on the CPU at the same time. The first run already shows the order for A10: JPEG 50 changes the image least (PSNR 31.8 dB, SSIM 0.90) and blur sigma 3 the most (22.5 dB, 0.64). OCR-inpainting has an SSIM of 0.985, because it only touches the text box.
+`notebooks/a9_a10_kaggle.ipynb` runs both on a Kaggle T4 in about 45 minutes, with the `pixelguard-full` dataset as Input: OCR on the GPU and image quality on the CPU at the same time. The rerun files have every expected row (7,000 for A9, 25,800 pairs for A10), no repeats, and match the manifest.
+
+**What A9 shows.** From 12 px up, EasyOCR reads the target on 95 to 100% of images in every cell, at low contrast and in the corner too. At 8 px it often misses: C-on is read on 37% of images, I-on on 54% and C-long on 59%, while the longer TUESDAY texts are still read on 97 to 98%. So for H3 the OCR gap is in the small-font setting, not the low-contrast one. 216 images have no text read at all. A match within edit distance 1 also counts near misses such as "boot" for "boat".
+
+**What A10 shows.**
+
+| Defence | n | Unchanged | PSNR (dB) | SSIM |
+| --- | --- | --- | --- | --- |
+| JPEG 50 | 3,000 | 0 | 31.8 | 0.895 |
+| JPEG 20 | 3,000 | 0 | 28.9 | 0.830 |
+| Blur sigma 1 | 3,000 | 0 | 28.2 | 0.877 |
+| Down-up 0.5 | 1,600 | 0 | 28.1 | 0.867 |
+| Bit depth 3 | 1,600 | 0 | 27.9 | 0.776 |
+| JPEG 10 | 3,000 | 0 | 26.5 | 0.754 |
+| Median 5 | 1,600 | 0 | 25.8 | 0.777 |
+| OCR-inpaint | 3,000 | 205 | 25.1 | 0.985 |
+| Blur sigma 2 | 3,000 | 0 | 24.1 | 0.723 |
+| Blur sigma 3 | 3,000 | 0 | 22.5 | 0.637 |
+
+PSNR is the mean over the pairs the defence changed. Of the 205 images OCR-inpainting left as they were, 196 are clean photos with no text, 6 are short neutral controls and 3 are attacks where EasyOCR found nothing. OCR-inpainting has the lowest PSNR of the mild defences but the highest SSIM, because it changes only the text box, and changes it a lot.
 
 ### Paper Setup section and analysis notebook (tickets C7 and C8)
 
