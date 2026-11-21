@@ -109,14 +109,14 @@ def plot_ocr_vs_asr(df, ocr):
 
 def table1(df, tv, quality, timing):
     """Table 1: one row per model and defence. Attack and clean rates use the 150 test photos at the
-    default rendering, context = C-on and instruction = I-off as in the pre-registration (H2)."""
+    default rendering. C-on is the context cell, I-off the original instruction cell (kept in Table 1 by
+    the pilot gate) and I-on the instruction cell H2 uses since the pilot gate."""
     key = ["model", "defence"]
     t = df[df.split == "test"]
     atk = t[t.setting == DEFAULT]
     groups = {
         "context_asr": atk[atk.cell == "c_on"].groupby(key).success,
         "instruction_asr": atk[atk.cell == "i_off"].groupby(key).success,
-        # not pre-registered: I-off is 0 everywhere, so the on-topic command shows how commands fare
         "i_on_asr": atk[atk.cell == "i_on"].groupby(key).success,
         "textvqa_acc": tv.groupby(key).acc,
         "clean_acc": t[t.cell == "clean"].groupby(key).correct,
@@ -138,7 +138,7 @@ def table1_latex(tab) -> str:
     return t.to_latex(index=False, escape=True, column_format="llrrrrrrrr", na_rep="--", formatters={
         "context_asr": pct, "instruction_asr": pct, "i_on_asr": pct, "textvqa_acc": pct, "clean_acc": pct,
         "psnr_mean": "{:.1f}".format, "ssim_mean": "{:.3f}".format, "ms_per_image": "{:.1f}".format,
-    }, header=["Model", "Defence", "C-on ASR (\\%)", "I-off ASR (\\%)", "I-on ASR (\\%)$^\\dagger$", "TextVQA (\\%)",
+    }, header=["Model", "Defence", "C-on ASR (\\%)", "I-off ASR (\\%)", "I-on ASR (\\%)", "TextVQA (\\%)",
                "Clean COCO (\\%)", "PSNR (dB)", "SSIM", "ms / image"])
 
 
