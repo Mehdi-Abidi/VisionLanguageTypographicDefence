@@ -5,6 +5,7 @@
     plot_asr_by_font(df)    -> ASR against font size, one line per attack cell, one panel per model
     textvqa()               -> one row per TextVQA answer (C9): image_id, defence, model, acc
     plot_asr_by_defence(df) -> Figure 2 (C9): ASR against blur and JPEG strength, one panel per model and defence
+    plot_ocr_vs_asr(df, ocr) -> Figure 3 (C9): EasyOCR recall against ASR per cell and rendering setting
     table1(...), table1_latex(tab) -> Table 1 (C9): attack, utility, image quality and time per defence
 Only the 150 `test` photos are used for plots (pre-registration: every reported number comes from test).
 """
@@ -73,6 +74,35 @@ def plot_asr_by_defence(df):
             ax.set_title(m)
         row[0].set_ylabel("attack success rate")
     axes[0][-1].legend()
+    fig.tight_layout()
+    return fig
+
+
+def plot_ocr_vs_asr(df, ocr):
+    """Figure 3: per cell and rendering setting, EasyOCR recall (A9) against ASR, no defence, test photos.
+    Colour is the cell, marker is the setting, both axes with Wilson 95% intervals."""
+    import matplotlib.pyplot as plt
+    key = ["image_id", "cell", "setting"]
+    d = df[(df.split == "test") & (df.defence == "none") & df.cell.isin(ATTACK_CELLS)]
+    d = d.merge(ocr[key + ["ocr_read"]], on=key, how="left", validate="m:1")
+    assert d.ocr_read.notna().all(), "attacked rows with no OCR label"
+    models = sorted(d.model.unique())
+    settings = sorted(d.setting.unique())
+    markers = dict(zip(settings, "osD^v<>"))
+    colours = dict(zip(ATTACK_CELLS, plt.rcParams["axes.prop_cycle"].by_key()["color"]))
+    fig, axes = plt.subplots(1, len(models), figsize=(4.5 * len(models), 4), sharex=True, sharey=True, squeeze=False)
+    for ax, m in zip(axes[0], models):
+        for (c, s), g in d[d.model == m].groupby(["cell", "setting"]):
+            x, xlo, xhi = wilson(int(g.ocr_read.sum()), len(g))
+            y, ylo, yhi = wilson(int(g.success.sum()), len(g))
+            ax.errorbar(x, y, xerr=[[x - xlo], [xhi - x]], yerr=[[y - ylo], [yhi - y]],
+                        marker=markers[s], color=colours[c], capsize=2, linestyle="none")
+        ax.set_xlabel("EasyOCR recall")
+        ax.set_title(m)
+    axes[0][0].set_ylabel("attack success rate")
+    handles = [plt.Line2D([], [], color=colours[c], marker="o", linestyle="none", label=c) for c in ATTACK_CELLS]
+    handles += [plt.Line2D([], [], color="grey", marker=markers[s], linestyle="none", label=s) for s in settings]
+    fig.legend(handles=handles, loc="center left", bbox_to_anchor=(1, 0.5), fontsize="small")
     fig.tight_layout()
     return fig
 

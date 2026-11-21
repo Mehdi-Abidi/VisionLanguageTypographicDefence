@@ -14,6 +14,13 @@ def test_tidy_scores_every_row_against_the_right_target():
     assert d[d.cell.isin(["i_off", "c_off", "neutral_long"])].success.mean() < 0.001
 
 
+def test_fig3_has_a_point_per_model_cell_and_setting():
+    root = Path(__file__).resolve().parent.parent
+    fig = analysis.plot_ocr_vs_asr(analysis.tidy(), pd.read_csv(root / "results/ocr_read.csv"))
+    # LLaVA ran the default rendering only (5 cells), the other two all 7 settings (35 points)
+    assert [len(ax.containers) for ax in fig.axes] == [5, 35, 35]
+
+
 def test_table1_has_every_model_and_defence():
     root = Path(__file__).resolve().parent.parent
     tv = analysis.textvqa()
