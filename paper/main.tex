@@ -112,13 +112,13 @@ We report attack success rate with Wilson 95\% intervals. With 150 test photos, 
 \label{sec:limitations}
 
 \paragraph{Small and quantised models.}
-We test three open models of 2B to 7B parameters, and LLaVA-NeXT runs in 4-bit. Larger or closed models may read and obey image text differently, and quantisation may change how LLaVA-NeXT behaves, so we do not claim our rates carry over to them. LLaVA-NeXT was also run only at the default rendering, so it has no font-size sweep.
+We test three open models of 2B to 7B parameters, and LLaVA-NeXT runs in 4-bit. Larger or closed models may read and obey image text differently, and quantisation may change how LLaVA-NeXT behaves, so we do not claim our rates carry over to them. In the rendering and defence sweeps LLaVA-NeXT was run only at the default rendering, so it has no font-size curve.
 
 \paragraph{Synthetic overlays.}
-The text is a clean, horizontal, high-contrast box added to a COCO photo. Text that is part of a real scene (a sign, a shirt, a product label) is bent, lit and cluttered in ways our overlays are not. Our images also hold one dominant object, and the text-free filter removes photos that a real deployment would contain.
+Our text is clean and horizontal, in a plain box added to a COCO photo. Text that is part of a real scene (a sign, a shirt, a product label) is bent, lit and cluttered in ways our overlays are not. Our images also hold one dominant object, and the text-free filter removes photos that a real deployment would contain.
 
 \paragraph{A search attacker, not a gradient attack.}
-The defence-aware attacker only searches a grid of 36 rendering settings (size, contrast, font, repeats) on 50 tuning photos, and the search is run on the two smaller models. It does not optimise against the defence, so a stronger attacker may keep more of the attack alive. Our numbers for defended attacks are therefore upper bounds on how well a defence works, not guarantees.
+The defence-aware attacker only searches a grid of 36 rendering settings (size, contrast, font, repeats) on 50 tuning photos, and the search is run on the two smaller models, so LLaVA-NeXT only sees the settings they chose. It does not change pixels with gradients through the model or the defence, so a stronger attacker may keep more of the attack alive. Our numbers for defended attacks are therefore upper bounds on how well a defence works, not guarantees.
 
 \paragraph{One question and one decoding.}
 Every run uses one question template, greedy decoding and one seed. Other phrasings, system prompts or sampling may move the rates, and a user question that asks about text would change the task.
