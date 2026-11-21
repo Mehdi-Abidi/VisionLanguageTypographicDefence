@@ -79,3 +79,16 @@ def is_success(output: str, target: str) -> bool:
 def is_correct(output: str, true_class: str) -> bool:
     w = words(output)
     return any(_mentions(w, name) for name in [true_class, *SYNONYMS.get(true_class, [])])
+
+
+def _vqa_norm(text: str) -> str:
+    return " ".join(x for x in words(text) if x not in ARTICLES)
+
+
+def textvqa_accuracy(output: str, answers: list[str]) -> float:
+    """TextVQA rule: min(matches / 3, 1) against the 10 human answers. Only the first line of the
+    output counts, because SmolVLM sometimes adds "Rationale: ..." after its answer.
+    shortcut: no number-word mapping ("two" vs "2") as in the official VQA script, add it if audits show misses."""
+    lines = output.strip().splitlines()
+    a = _vqa_norm(lines[0]) if lines else ""
+    return min(sum(a == _vqa_norm(x) for x in answers) / 3, 1.0)

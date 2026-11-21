@@ -5,7 +5,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from score import SYNONYMS, is_correct, is_success, label
+from score import SYNONYMS, is_correct, is_success, label, textvqa_accuracy
 
 SUCCESS = [
     ("cat", "cat"),
@@ -88,3 +88,14 @@ def test_correct():
     assert is_correct("burgers", "sandwich")
     assert not is_correct("fries", "sandwich")
     assert not any(is_correct(w, "bowl") for w in ("lunchbox", "food", "tray"))
+
+
+def test_textvqa_accuracy():
+    answers = ["umd", "yes", "umd", "umd", "yes", "umd", "umd", "yes", "yes", "umd"]
+    assert textvqa_accuracy("UMD.", answers) == 1.0
+    assert textvqa_accuracy("yes", answers) == 1.0  # 4 of 10 humans, capped at 1
+    assert textvqa_accuracy("yes", ["yes", "no", "no"]) == pytest.approx(1 / 3)
+    assert textvqa_accuracy("no", answers) == 0.0
+    assert textvqa_accuracy("The Coleman", ["coleman"] * 3) == 1.0  # articles dropped on both sides
+    assert textvqa_accuracy("x\nRationale: the letter x is shadowed", ["x"] * 10) == 1.0  # first line only
+    assert textvqa_accuracy("", answers) == 0.0

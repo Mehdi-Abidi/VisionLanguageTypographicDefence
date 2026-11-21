@@ -1,0 +1,11 @@
+defence,ms_per_image,n_images,repeats,cpu,ocr_on_gpu
+blur_s1,0.47,8,5,"Intel64 Family 6 Model 186 Stepping 3, GenuineIntel",False
+blur_s2,0.89,8,5,"Intel64 Family 6 Model 186 Stepping 3, GenuineIntel",False
+blur_s3,1.37,8,5,"Intel64 Family 6 Model 186 Stepping 3, GenuineIntel",False
+median_5,2.63,8,5,"Intel64 Family 6 Model 186 Stepping 3, GenuineIntel",False
+jpeg_q50,7.23,8,5,"Intel64 Family 6 Model 186 Stepping 3, GenuineIntel",False
+jpeg_q20,5.66,8,5,"Intel64 Family 6 Model 186 Stepping 3, GenuineIntel",False
+jpeg_q10,6.17,8,5,"Intel64 Family 6 Model 186 Stepping 3, GenuineIntel",False
+bits_3,20.94,8,5,"Intel64 Family 6 Model 186 Stepping 3, GenuineIntel",False
+downup_05,0.88,8,5,"Intel64 Family 6 Model 186 Stepping 3, GenuineIntel",False
+ocr_inpaint,2063.11,8,5,"Intel64 Family 6 Model 186 Stepping 3, GenuineIntel",False
