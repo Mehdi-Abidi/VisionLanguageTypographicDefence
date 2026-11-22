@@ -25,7 +25,7 @@ def test_table1_has_every_model_and_defence():
     root = Path(__file__).resolve().parent.parent
     tv = analysis.textvqa()
     assert len(tv) == 3 * 2200 and tv.acc.between(0, 1).all()
-    tab = analysis.table1(analysis.tidy(), tv, pd.read_csv(root / "results/image_quality.csv"),
+    tab = analysis.table1(analysis.tidy(), tv, pd.read_csv(root / "results/image_quality_rows.csv"),
                           pd.read_csv(root / "results/defence_timing.csv"))
     assert len(tab) == 3 * 11 and list(tab.defence[:11]) == analysis.DEFENCES
     # only the undefended row lacks image quality and time

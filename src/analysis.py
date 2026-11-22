@@ -13,6 +13,7 @@ import json
 from pathlib import Path
 
 import matplotlib
+import numpy as np
 import pandas as pd
 
 from score import is_correct, is_success, textvqa_accuracy
@@ -110,9 +111,14 @@ def plot_ocr_vs_asr(df, ocr):
 def table1(df, tv, quality, timing):
     """Table 1: one row per model and defence. Attack and clean rates use the 150 test photos at the
     default rendering. C-on is the context cell, I-off the original instruction cell (kept in Table 1 by
-    the pilot gate) and I-on the instruction cell H2 uses since the pilot gate."""
+    the pilot gate) and I-on the instruction cell H2 uses since the pilot gate. PSNR and SSIM come from the
+    A10 per-pair rows of the same test photos at the default rendering and the clean photos, and pairs the
+    defence left unchanged (infinite PSNR) are left out of the PSNR mean."""
     key = ["model", "defence"]
     t = df[df.split == "test"]
+    q = quality[quality.image_id.isin(set(t.image_id)) & quality.setting.isin([DEFAULT, "none"])]
+    q = q.assign(psnr=q.psnr.where(np.isfinite(q.psnr)))
+    quality = q.groupby("defence").agg(psnr_mean=("psnr", "mean"), ssim_mean=("ssim", "mean")).reset_index()
     atk = t[t.setting == DEFAULT]
     groups = {
         "context_asr": atk[atk.cell == "c_on"].groupby(key).success,
