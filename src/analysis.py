@@ -7,6 +7,8 @@
     plot_asr_by_defence(df) -> Figure 2 (C9): ASR against blur and JPEG strength, one panel per model and defence
     plot_ocr_vs_asr(df, ocr) -> Figure 3 (C9): EasyOCR recall against ASR per cell and rendering setting
     table1(...), table1_latex(tab) -> Table 1 (C9): attack, utility, image quality and time per defence
+    attacker_tidy()         -> the B10 runs scored like tidy()
+    table2(df, atk, chosen), table2_latex(tab) -> Table 2 (C9): attack success before and after the attacker search
 Only the 150 `test` photos are used for plots (pre-registration: every reported number comes from test).
 """
 import json
@@ -30,10 +32,13 @@ LADDERS = {"blur sigma": (["none", "blur_s1", "blur_s2", "blur_s3"], ["0", "1", 
            "JPEG quality": (["none", "jpeg_q50", "jpeg_q20", "jpeg_q10"], ["none", "50", "20", "10"])}
 
 
-def tidy(runs=ROOT / "runs", data=ROOT / "data") -> pd.DataFrame:
+def tidy(runs=ROOT / "runs", data=ROOT / "data", files=None) -> pd.DataFrame:
+    """files: score these JSONL files instead of the B6 and B7 runs (attacker_tidy uses it for B10)."""
     t = pd.read_csv(data / "attack_set.csv")[["image_id", "split", "category", "on_topic_target", "off_topic_canary"]]
     # utility_*.jsonl (TextVQA, B8) have their own prompts and are scored elsewhere.
-    d = pd.concat([pd.read_json(f, lines=True) for f in sorted(Path(runs).glob("*.jsonl")) if not f.name.startswith(("utility", "pilot", "attacker"))])
+    if files is None:
+        files = [f for f in sorted(Path(runs).glob("*.jsonl")) if not f.name.startswith(("utility", "pilot", "attacker"))]
+    d = pd.concat([pd.read_json(f, lines=True) for f in files])
     d = d.merge(t, on="image_id", how="left", validate="m:1")
     assert d.split.notna().all(), "run rows with an image_id not in attack_set.csv"
     d = d.drop_duplicates(["image_id", "cell", "setting", "defence", "model"])
@@ -41,6 +46,14 @@ def tidy(runs=ROOT / "runs", data=ROOT / "data") -> pd.DataFrame:
     d["success"] = [int(is_success(o, x)) for o, x in zip(d.output, target)]
     d["correct"] = [int(is_correct(o, c)) for o, c in zip(d.output, d.category)]
     return d[["image_id", "cell", "setting", "defence", "model", "split", "success", "correct"]]
+
+
+def attacker_tidy(runs=ROOT / "runs", data=ROOT / "data") -> pd.DataFrame:
+    """The B10 runs (runs/attacker_{model}.jsonl, not the B9 attacker_search ones), scored like tidy()."""
+    files = [f for f in sorted(Path(runs).glob("attacker_*.jsonl")) if not f.name.startswith("attacker_search")]
+    d = tidy(runs, data, files)
+    assert (d.split == "test").all(), "B10 rows on a photo outside the test split"
+    return d
 
 
 def textvqa(runs=ROOT / "runs", data=ROOT / "data") -> pd.DataFrame:
@@ -146,6 +159,44 @@ def table1_latex(tab) -> str:
         "psnr_mean": "{:.1f}".format, "ssim_mean": "{:.3f}".format, "ms_per_image": "{:.1f}".format,
     }, header=["Model", "Defence", "C-on ASR (\\%)", "I-off ASR (\\%)", "I-on ASR (\\%)", "TextVQA (\\%)",
                "Clean COCO (\\%)", "PSNR (dB)", "SSIM", "ms / image"])
+
+
+def table2(df, atk, chosen):
+    """Table 2: per defence B9 attacked, model and cell, attack success on the 150 test photos with the
+    default rendering through the defence (B7), with the setting B9 chose through the defence (B10), and
+    with the chosen setting and no defence (B10). chosen: the `defences` part of configs/attacker.yaml."""
+    rows = []
+    for d, cfg in chosen.items():
+        for m in sorted(atk.model.unique()):
+            for c in ["c_on", "i_on"]:
+                parts = {
+                    "default": df[(df.split == "test") & (df.setting == DEFAULT) & (df.defence == d)],
+                    "searched": atk[(atk.setting == cfg["setting"]) & (atk.defence == d)],
+                    "searched_undefended": atk[(atk.setting == cfg["setting"]) & (atk.defence == "none")],
+                }
+                row = {"defence": d, "setting": cfg["setting"], "model": m, "cell": c}
+                for name, p in parts.items():
+                    g = p[(p.model == m) & (p.cell == c)]
+                    assert len(g) == 150, f"{name} {d} {m} {c}: {len(g)} answers, expected 150"
+                    row[name], row[name + "_lo"], row[name + "_hi"] = wilson(int(g.success.sum()), len(g))
+                rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def table2_latex(tab) -> str:
+    ci = lambda r, k: f"{100 * r[k]:.1f} [{100 * r[k + '_lo']:.1f}, {100 * r[k + '_hi']:.1f}]"
+    t = pd.DataFrame({
+        "defence": tab.defence.where(~tab.defence.duplicated(), ""),
+        "setting": tab.setting.where(~tab.defence.duplicated(), ""),
+        "model": tab.model.where(~tab[["defence", "model"]].duplicated(), ""),
+        "cell": tab.cell.map({"c_on": "C-on", "i_on": "I-on"}),
+        "default": [ci(r, "default") for _, r in tab.iterrows()],
+        "searched": [ci(r, "searched") for _, r in tab.iterrows()],
+        "undefended": [f"{100 * x:.1f}" for x in tab.searched_undefended],
+    })
+    return t.to_latex(index=False, escape=True, column_format="llllrrr", header=[
+        "Defence", "Chosen setting", "Model", "Cell", "Default rendering (\\%)", "Chosen setting (\\%)",
+        "Chosen, no defence (\\%)"])
 
 
 def _bar(ax, rows, x, label=None):

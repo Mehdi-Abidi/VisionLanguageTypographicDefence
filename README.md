@@ -117,7 +117,7 @@ The full ticket list with dates, steps and dependencies is in [docs/task-board.m
 
 ## Progress so far
 
-Status on 22 November 2026: phase 0 and phase 1 are done (ALL-1, A1 to A6, B1 to B5, C1 to C6) and the pilot gate decisions are written down. Phase 2 is done: A7, A8, the full runs B6, B7 and B8 for all three models, the Setup section of the paper (C7) and the analysis notebook (C8). In phase 3, A9, A10, the Limitations section of the paper (C11) and the pre-registered tests (C10, in `results/hypothesis_tests.csv` and `results/hypothesis_summary.csv`) are done. C9 has Figures 2 and 3 and Table 1, and Table 2 waits for B10. B9, the attacker search, is done and its choice is in `configs/attacker.yaml`. For B10 the images are rendered and the SmolVLM run is in. The Qwen and LLaVA runs are next. This section says what was done, where the data came from, and how 5,000 photos became 200.
+Status on 22 November 2026: phase 0 and phase 1 are done (ALL-1, A1 to A6, B1 to B5, C1 to C6) and the pilot gate decisions are written down. Phase 2 is done: A7, A8, the full runs B6, B7 and B8 for all three models, the Setup section of the paper (C7) and the analysis notebook (C8). In phase 3, A9, A10, the Limitations section of the paper (C11) and the pre-registered tests (C10, in `results/hypothesis_tests.csv` and `results/hypothesis_summary.csv`) are done. C9 is done: Figures 2 and 3 and Tables 1 and 2. B9, the attacker search, is done and its choice is in `configs/attacker.yaml`. B10 is done: the attacker runs for all three models are in `runs/`. The results freeze (ALL-3) is next. This section says what was done, where the data came from, and how 5,000 photos became 200.
 
 ### Where the data comes from
 
@@ -602,6 +602,14 @@ Both files are committed. Steps:
 1. `notebooks/b10_render_kaggle.ipynb` renders the images on a Kaggle GPU (about 15 minutes). Its output becomes the `pixelguard-attacker-test` dataset, shared with Mufeed and Ali.
 2. Each person runs their full-run notebook with `SWEEP = 'attacker_test'`, `PART = 1`: about 0.7 hours for SmolVLM, 0.3 for Qwen and 2 for LLaVA. LLaVA runs it too, because `ONLY_DEFAULT_SETTING` only applies to the B6 and B7 sweeps.
 3. The three files are committed as `runs/attacker_{model}.jsonl`.
+
+| File | Rows | Run | Checks |
+| --- | --- | --- | --- |
+| `runs/attacker_smolvlm2-2b.jsonl` | 1,500 | Mehdi, Kaggle T4, 21 Nov 2026, about 33 minutes | Exactly the rows of `manifests/attacker_test.csv`, no repeats, no empty answers, one config hash (`f58543b7…`, the same as its B6 and B7 runs) |
+| `runs/attacker_qwen3-vl-4b.jsonl` | 1,500 | Mufeed, Kaggle T4, 22 Nov 2026, about 11 minutes | Exactly the rows of the manifest, no repeats, no empty answers, one config hash (`0930bfbd…`, the same as its B6 and B7 runs) |
+| `runs/attacker_llava-next-mistral-7b.jsonl` | 1,500 | Ali, Kaggle T4, 22 Nov 2026, about 2 hours | Exactly the rows of the manifest, no repeats, no empty answers, one config hash (`60ba034d…`, the same as its B6 and B7 runs) |
+
+**What B10 shows (Table 2, `paper/tables/table2_attacker.tex`).** The setting B9 chose (32 px instead of 16 px) gets more attacks through blur sigma 2 and JPEG 20 in every model and both cells. Through blur, SmolVLM's C-on goes from 15.3% to 34.7% and Qwen's from 26.0% to 36.0%. Through JPEG 20, SmolVLM's goes from 33.3% to 44.7%. On Qwen the 32 px attack works better through the defence than with no defence (36.0% through blur against 23.3% without it). OCR-inpainting holds: the chosen setting, three copies of the text at 32 px, gets through on at most 1.3% of photos in any model and cell, against 6 to 21% with no defence.
 
 ### OCR read and image quality (tickets A9 and A10)
 
