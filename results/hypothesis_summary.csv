@@ -1,0 +1,6 @@
+hypothesis,models_holding,models,supported
+H1a,2,"qwen3-vl-4b, smolvlm2-2b",True
+H1b,3,"llava-next-mistral-7b, qwen3-vl-4b, smolvlm2-2b",True
+H2,0,,False
+H3,2,"qwen3-vl-4b, smolvlm2-2b",True
+H4,3,"llava-next-mistral-7b, qwen3-vl-4b, smolvlm2-2b",
