@@ -21,6 +21,17 @@ def test_fig3_has_a_point_per_model_cell_and_setting():
     assert [len(ax.containers) for ax in fig.axes] == [5, 35, 35]
 
 
+def test_table2_has_every_defence_model_and_cell():
+    import yaml
+    root = Path(__file__).resolve().parent.parent
+    atk = analysis.attacker_tidy()
+    assert len(atk) == 3 * 1500 and not atk.duplicated(["image_id", "cell", "setting", "defence", "model"]).any()
+    chosen = yaml.safe_load(open(root / "configs/attacker.yaml"))["defences"]
+    tab = analysis.table2(analysis.tidy(), atk, chosen)  # asserts 150 answers in every cell
+    assert len(tab) == 3 * 3 * 2 and tab[["default", "searched", "searched_undefended"]].stack().between(0, 1).all()
+    assert "[" in analysis.table2_latex(tab)
+
+
 def test_table1_has_every_model_and_defence():
     root = Path(__file__).resolve().parent.parent
     tv = analysis.textvqa()
