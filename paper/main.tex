@@ -15,6 +15,12 @@
 \begin{document}
 \maketitle
 
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Typographic attacks on CLIP and VLMs.}
+A word written on an image can change what a vision model says about it. \citet{goh2021multimodal} showed this for CLIP, which could be led to the wrong class by text placed on the object. Later work moved to large vision-language models. \citet{cheng2024unveiling} put misleading answer labels on images for multiple-choice VQA, varied their size, opacity, colour and position, and tested LLaVA-1.5 and 1.6, InstructBLIP and MiniGPT4-v2. Their mitigation is a prompt, and it shrinks the performance drop from 42.07\% to 13.90\%. \citet{qraitem2024selfgen} let a model write its own attack labels and found that a class name with a short description hurts LVLMs more than the class name alone, with drops of up to 60\%. RIO-Bench \citep{waseda2025rio} pairs read and ignore versions of the same TextVQA scene, using misleading class labels for object questions and contradicting phrases for text questions. Every attack in this line is a label or a false fact. None is phrased as an instruction.
+
 \section{Setup}
 \label{sec:setup}
 
