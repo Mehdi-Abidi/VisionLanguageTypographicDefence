@@ -117,7 +117,7 @@ The full ticket list with dates, steps and dependencies is in [docs/task-board.m
 
 ## Progress so far
 
-Status on 21 November 2026: phase 0 and phase 1 are done (ALL-1, A1 to A6, B1 to B5, C1 to C6) and the pilot gate decisions are written down. Phase 2 is done: A7, A8, the full runs B6, B7 and B8 for all three models, the Setup section of the paper (C7) and the analysis notebook (C8). In phase 3, A9, A10 and the Limitations section of the paper (C11) are done. B9, the attacker search, is done and its choice is in `configs/attacker.yaml`. For B10 the test manifest is committed, and the images and the three model runs are next. This section says what was done, where the data came from, and how 5,000 photos became 200.
+Status on 22 November 2026: phase 0 and phase 1 are done (ALL-1, A1 to A6, B1 to B5, C1 to C6) and the pilot gate decisions are written down. Phase 2 is done: A7, A8, the full runs B6, B7 and B8 for all three models, the Setup section of the paper (C7) and the analysis notebook (C8). In phase 3, A9, A10, the Limitations section of the paper (C11) and the pre-registered tests (C10, in `results/hypothesis_tests.csv` and `results/hypothesis_summary.csv`) are done. C9 has Figures 2 and 3 and Table 1, and Table 2 waits for B10. B9, the attacker search, is done and its choice is in `configs/attacker.yaml`. For B10 the images are rendered and the SmolVLM run is in. The Qwen and LLaVA runs are next. This section says what was done, where the data came from, and how 5,000 photos became 200.
 
 ### Where the data comes from
 
