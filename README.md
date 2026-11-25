@@ -716,7 +716,42 @@ pip install -r requirements.txt
 pytest tests/
 ```
 
-Rendered images, COCO and TextVQA live in a shared Kaggle dataset, not in this repo. Model runs happen in Kaggle notebooks that read `manifests/*.csv` and write `runs/*.jsonl`. See the task board for the exact steps.
+### The headline result
+
+![Attack success rate against defence strength, per model, context vs instruction attacks](paper/figures/fig2_defence_strength.png)
+
+Context attacks (`c_on`, blue, and `c_long`, green) hold up as blur and JPEG compression get stronger, while instruction attacks (`i_on`, orange) do not rise the same way and `i_off`/`c_off` stay near zero throughout. This is RQ2 (H2): a defence tuned against instructions does not necessarily say anything about context attacks.
+
+### Rebuild every figure and table
+
+Nothing below needs a GPU or the internet. `runs/*.jsonl` (42 MB) is committed in full — the actual model answers behind every number in the paper, frozen at the `results-freeze` tag — so rebuilding is pure computation over files already in the clone:
+
+```bash
+cd notebooks
+jupyter nbconvert --to notebook --execute --inplace analysis.ipynb
+cd ..
+```
+
+Run it from inside `notebooks/` — its paths (`../src`, `../results`, `../paper`) are relative to that directory. This one notebook reads every `runs/*.jsonl`, scores each row with `src/score.py`, and regenerates: `results/tidy.csv`, `results/asr_by_cell.png`, `results/asr_by_font.png`, Figures 2 and 3 (`paper/figures/fig2_defence_strength.pdf`, `fig3_ocr_vs_asr.pdf`), Tables 1 and 2 (`paper/tables/*.tex`), and the pre-registered hypothesis tests (`results/hypothesis_tests.csv`, `hypothesis_summary.csv`). This is the "notebook that reproduces every figure" the abstract promises — confirmed by actually running it end to end against the committed data, not just reading the code.
+
+### Generate new data yourself (optional)
+
+The two steps above read data that already exists. To check that the pipeline can also *produce* that data from scratch — useful if you want to extend the study, not needed just to see the existing results — the same pipeline at pilot scale (20 tuning photos) is:
+
+1. **Render the pilot images.** Downloads the 20 tuning photos from the public COCO server once, caches them in `data/raw/val2017/`, then renders and defends every cell:
+   ```bash
+   python src/make_manifest.py --generate
+   ```
+   Writes `manifests/pilot.csv` (480 rows: 20 photos x 8 cells x 3 defences: none, blur_s2, ocr_inpaint) and the image files under `images/`. Needs internet (to reach `images.cocodataset.org`), plus `easyocr` and `torch` for the `ocr_inpaint` rows (already in `requirements.txt`); add `--skip-ocr` to skip them if that install is giving trouble.
+
+2. **Run one model on it.** GPU strongly recommended — this is painfully slow on CPU:
+   ```bash
+   python src/run_model.py --model qwen3-vl-4b --manifest manifests/pilot.csv \
+       --images-root . --out runs/pilot_qwen3-vl-4b.jsonl
+   ```
+   `--model` is `qwen3-vl-4b`, `smolvlm2-2b`, or `llava-next-mistral-7b`. Kaggle notebooks that do this for all three models, from a fresh clone, are in `notebooks/` (start with `b5_pilot_kaggle.ipynb`).
+
+The full 200-image, three-model, defence-aware-attacker pipeline needs far more GPU time than a laptop gives in one sitting, so that ran on Kaggle. Rendered images, COCO and TextVQA for the full-scale runs live in a shared Kaggle dataset, so the team is not re-downloading and re-rendering 5,000+ images on every Kaggle session. Model runs for the full 200-image set happen in the Kaggle notebooks in `notebooks/` that read `manifests/*.csv` and write `runs/*.jsonl`. See the task board for the exact steps and dependencies for each one.
 
 ## Documents
 
