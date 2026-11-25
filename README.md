@@ -720,11 +720,13 @@ pytest tests/
 
 ![Attack success rate against defence strength, per model, context vs instruction attacks](paper/figures/fig2_defence_strength.png)
 
-Context attacks (`c_on`, blue, and `c_long`, green) hold up as blur and JPEG compression get stronger, while instruction attacks (`i_on`, orange) do not rise the same way and `i_off`/`c_off` stay near zero throughout. This is RQ2 (H2): a defence tuned against instructions does not necessarily say anything about context attacks.
+Figure 2 shows attack success on the 150 test photos at the default rendering as blur and JPEG get stronger. The two defences act differently. JPEG never removes the label attacks: `c_on` stays level or rises, and on Qwen it goes from 14% with no defence to 30% at quality 10. On Qwen the long label (`c_long`) rises from 17% to 43% under both strong blur and strong JPEG. Blur at sigma 3 brings `c_on` down to 1 to 7%, but it also costs 27 to 33 points of TextVQA accuracy (Table 1). The off-topic cells `i_off` and `c_off` stay at or near zero everywhere.
+
+The pre-registered H2 test asked whether labels survive a defence better than commands. It was not supported. Qwen and LLaVA had fewer than 10 undefended `i_on` successes, so it could not be tested, and on SmolVLM the difference was not significant (`results/hypothesis_tests.csv`).
 
 ### Rebuild every figure and table
 
-Nothing below needs a GPU or the internet. `runs/*.jsonl` (42 MB) is committed in full — the actual model answers behind every number in the paper, frozen at the `results-freeze` tag — so rebuilding is pure computation over files already in the clone:
+Rebuilding needs no GPU and no internet. `runs/*.jsonl` (42 MB) holds every model answer behind the numbers in the paper, frozen at the `results-freeze` tag, so the rebuild only reads files already in the clone:
 
 ```bash
 cd notebooks
@@ -732,24 +734,25 @@ jupyter nbconvert --to notebook --execute --inplace analysis.ipynb
 cd ..
 ```
 
-Run it from inside `notebooks/` — its paths (`../src`, `../results`, `../paper`) are relative to that directory. This one notebook reads every `runs/*.jsonl`, scores each row with `src/score.py`, and regenerates: `results/tidy.csv`, `results/asr_by_cell.png`, `results/asr_by_font.png`, Figures 2 and 3 (`paper/figures/fig2_defence_strength.pdf`, `fig3_ocr_vs_asr.pdf`), Tables 1 and 2 (`paper/tables/*.tex`), and the pre-registered hypothesis tests (`results/hypothesis_tests.csv`, `hypothesis_summary.csv`). This is the "notebook that reproduces every figure" the abstract promises — confirmed by actually running it end to end against the committed data, not just reading the code.
+Run it from inside `notebooks/`, because its paths (`../src`, `../results`, `../paper`) are relative to that folder. The notebook reads every `runs/*.jsonl`, scores each row with `src/score.py`, and writes `results/tidy.csv`, `results/asr_by_cell.png`, `results/asr_by_font.png`, Figures 2 and 3 (`paper/figures/fig2_defence_strength.pdf` and `.png`, `fig3_ocr_vs_asr.pdf`), Tables 1 and 2 (`paper/tables/*.tex`) and the pre-registered hypothesis tests (`results/hypothesis_tests.csv`, `hypothesis_summary.csv`, `h3_by_setting.csv`). On a laptop it takes a few minutes. The tables and results files come out byte for byte the same as the committed ones. The figure PDFs can differ in a few bytes with another matplotlib version.
 
 ### Generate new data yourself (optional)
 
-The two steps above read data that already exists. To check that the pipeline can also *produce* that data from scratch — useful if you want to extend the study, not needed just to see the existing results — the same pipeline at pilot scale (20 tuning photos) is:
+The steps above read data that already exists. To make new data, for example to extend the study, run the same pipeline at pilot scale (the first 20 tuning photos):
 
-1. **Render the pilot images.** Downloads the 20 tuning photos from the public COCO server once, caches them in `data/raw/val2017/`, then renders and defends every cell:
+1. **Render the pilot images.** `render.py` downloads the 20 photos from the public COCO server once (a few MB, cached in `data/raw/val2017/`) and writes the eight cells of each photo to `images/`. `make_manifest.py --generate` then writes `manifests/pilot.csv` (480 rows: 20 photos x 8 cells x 3 defences, which are none, blur_s2 and ocr_inpaint) and creates the defended images next to the renders.
    ```bash
+   python src/render.py --n 20
    python src/make_manifest.py --generate
    ```
-   Writes `manifests/pilot.csv` (480 rows: 20 photos x 8 cells x 3 defences: none, blur_s2, ocr_inpaint) and the image files under `images/`. Needs internet (to reach `images.cocodataset.org`), plus `easyocr` and `torch` for the `ocr_inpaint` rows (already in `requirements.txt`); add `--skip-ocr` to skip them if that install is giving trouble.
+   The first step needs internet access to `images.cocodataset.org`. The `ocr_inpaint` rows need `easyocr` and `torch`, which are in `requirements.txt`. Add `--skip-ocr` to the second command to leave those rows out if that install fails. Run `--generate` only after `render.py`, because it builds each defended image from a render already on disk and skips any that are missing.
 
-2. **Run one model on it.** GPU strongly recommended — this is painfully slow on CPU:
+2. **Run one model on it.** Use a GPU, because on a CPU this takes hours:
    ```bash
    python src/run_model.py --model qwen3-vl-4b --manifest manifests/pilot.csv \
        --images-root . --out runs/pilot_qwen3-vl-4b.jsonl
    ```
-   `--model` is `qwen3-vl-4b`, `smolvlm2-2b`, or `llava-next-mistral-7b`. Kaggle notebooks that do this for all three models, from a fresh clone, are in `notebooks/` (start with `b5_pilot_kaggle.ipynb`).
+   `--model` is `qwen3-vl-4b`, `smolvlm2-2b` or `llava-next-mistral-7b`. `notebooks/b5_pilot_kaggle.ipynb` runs all three models on Kaggle. It clones the repo with a `GITHUB_TOKEN` Kaggle secret and reads the pilot images from the team's Kaggle dataset instead of rendering them.
 
 The full 200-image, three-model, defence-aware-attacker pipeline needs far more GPU time than a laptop gives in one sitting, so that ran on Kaggle. Rendered images, COCO and TextVQA for the full-scale runs live in a shared Kaggle dataset, so the team is not re-downloading and re-rendering 5,000+ images on every Kaggle session. Model runs for the full 200-image set happen in the Kaggle notebooks in `notebooks/` that read `manifests/*.csv` and write `runs/*.jsonl`. See the task board for the exact steps and dependencies for each one.
 
