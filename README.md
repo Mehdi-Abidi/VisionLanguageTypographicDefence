@@ -740,17 +740,18 @@ Run it from inside `notebooks/`, because its paths (`../src`, `../results`, `../
 
 The steps above read data that already exists. To make new data, for example to extend the study, run the same pipeline at pilot scale (the first 20 tuning photos):
 
-1. **Render the pilot images.** `render.py` downloads the 20 photos from the public COCO server once (a few MB, cached in `data/raw/val2017/`) and writes the eight cells of each photo to `images/`. `make_manifest.py --generate` then writes `manifests/pilot.csv` (480 rows: 20 photos x 8 cells x 3 defences, which are none, blur_s2 and ocr_inpaint) and creates the defended images next to the renders.
+1. **Render the pilot images.** `render.py` downloads the 20 photos from the public COCO server once (a few MB, cached in `data/raw/val2017/`) and writes the eight cells of each photo to `images/`. `make_manifest.py --generate` then writes `manifests/pilot_new.csv` (480 rows: 20 photos x 8 cells x 3 defences, which are none, blur_s2 and ocr_inpaint) and creates the defended images next to the renders.
    ```bash
    python src/render.py --n 20
-   python src/make_manifest.py --generate
+   python src/make_manifest.py --generate --out manifests/pilot_new.csv
    ```
+   These are not exactly the 20 photos of the 12 November pilot in `manifests/pilot.csv`. Two of those (161978 and 226154) were swapped on 14 November, and their replacements sit further down the tune list, so the new pilot has 260261 and 273420 in their place. The `_new` names keep the committed pilot files as they are.
    The first step needs internet access to `images.cocodataset.org`. The `ocr_inpaint` rows need `easyocr` and `torch`, which are in `requirements.txt`. Add `--skip-ocr` to the second command to leave those rows out if that install fails. Run `--generate` only after `render.py`, because it builds each defended image from a render already on disk and skips any that are missing.
 
 2. **Run one model on it.** Use a GPU, because on a CPU this takes hours:
    ```bash
-   python src/run_model.py --model qwen3-vl-4b --manifest manifests/pilot.csv \
-       --images-root . --out runs/pilot_qwen3-vl-4b.jsonl
+   python src/run_model.py --model qwen3-vl-4b --manifest manifests/pilot_new.csv \
+       --images-root . --out runs/pilot_new_qwen3-vl-4b.jsonl
    ```
    `--model` is `qwen3-vl-4b`, `smolvlm2-2b` or `llava-next-mistral-7b`. `notebooks/b5_pilot_kaggle.ipynb` runs all three models on Kaggle. It clones the repo with a `GITHUB_TOKEN` Kaggle secret and reads the pilot images from the team's Kaggle dataset instead of rendering them.
 
